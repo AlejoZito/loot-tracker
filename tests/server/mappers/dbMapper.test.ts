@@ -9,6 +9,7 @@ import {
   rowToCategoryTransaction,
   rowToMonthlySummary,
   dateTimeToDb,
+  EXPENSE_COLUMNS,
   type ExpenseRow,
   type InstallmentRow,
   type SummaryRow,
@@ -21,7 +22,7 @@ const expenseRow: ExpenseRow = {
   id: 'exp-1',
   occurred_at: '2024-06-20T14:30:00',
   category: 'Supermercado',
-  amount: '15000.00',          // PostgREST serialises numeric as a string
+  amount: 15000,
   installments: 1,
   currency: 'ARS',
   notes: 'weekly shop',
@@ -31,16 +32,14 @@ const expenseRow: ExpenseRow = {
 };
 
 describe('dbMapper', () => {
-  describe('numeric parsing', () => {
-    it('parses numeric columns that arrive as strings', () => {
-      // Unparsed, these concatenate instead of summing in every downstream total.
-      const e = rowToExpense(expenseRow);
-      expect(e.amount).toBe(15000);
-      expect(typeof e.amount).toBe('number');
+  describe('numeric columns', () => {
+    it('casts amount so PostgREST returns a number, not a numeric string', () => {
+      // Without the cast every downstream total concatenates instead of summing.
+      expect(EXPENSE_COLUMNS).toContain('amount:amount::float8');
     });
 
-    it('treats null amounts as 0 rather than NaN', () => {
-      const e = rowToExpense({ ...expenseRow, amount: null as unknown as string });
+    it('treats a null amount as 0 rather than NaN', () => {
+      const e = rowToExpense({ ...expenseRow, amount: null as unknown as number });
       expect(e.amount).toBe(0);
     });
   });
@@ -82,6 +81,7 @@ describe('dbMapper', () => {
       const e = rowToExpense(expenseRow);
       expect(e.id).toBe('exp-1');
       expect(e.category).toBe('Supermercado');
+      expect(e.amount).toBe(15000);
       expect(e.currency).toBe('ARS');
       expect(e.notes).toBe('weekly shop');
       expect(e.type).toBe('expense');
@@ -137,31 +137,33 @@ describe('dbMapper', () => {
   describe('rowToInstallmentExpense', () => {
     const row: InstallmentRow = {
       expense_id: 'exp-1',
-      category: 'Supermercado',
-      installments: 3,
       installment_number: 2,
-      notes: null,
-      type: 'expense',
-      shared: false,
-      user_id: 'user-a',
-      period_date: '2024-07-20',
+      installment_amount: 5000,
       origin_month: '2024-06-01',
-      amount_local: '5000.00',
-      currency_local: 'ARS',
-      amount_at_period: '3.8461',
-      amount_at_origin: '3.6496',
+      period_month: '2024-07-01',
+      period_key: '2024-07',
+      period_date: '2024-07-20',
     };
+    const parent = new Expense(
+      'exp-1', new DateTime(2024, 6, 20, 14, 30), 'Supermercado', 15000, 3,
+      'ARS', 'weekly shop', 'expense', true, 'user-a',
+    );
 
-    it('maps the local amount and both converted amounts', () => {
-      const i = rowToInstallmentExpense(row);
+    it('takes the split amount from the row and everything else from the parent expense', () => {
+      const i = rowToInstallmentExpense(row, parent);
       expect(i.installmentAmount).toBe(5000);
+      expect(i.category).toBe('Supermercado');
       expect(i.currency).toBe('ARS');
-      expect(i.usdCurrentMonth).toBeCloseTo(3.8461, 4);
-      expect(i.usdOrigin).toBeCloseTo(3.6496, 4);
+      expect(i.notes).toBe('weekly shop');
+      expect(i.type).toBe('expense');
+      expect(i.shared).toBe(true);
+      expect(i.user).toBe('user-a');
+      expect(i.installments).toBe(3);
+      expect(i.installmentNumber).toBe(2);
     });
 
     it('keeps the installment and origin periods distinct', () => {
-      const i = rowToInstallmentExpense(row);
+      const i = rowToInstallmentExpense(row, parent);
       expect(i.period.toISO()).toBe('2024-07-20');
       expect(i.originPeriod.toISO()).toBe('2024-06-01');
     });
@@ -174,7 +176,7 @@ describe('dbMapper', () => {
       user_id: 'User-A',
       shared: true,
       period: '2024-06',
-      amount: '231.5',
+      amount: 231.5,
     };
 
     it('maps the period into the Period value object', () => {
@@ -193,21 +195,21 @@ describe('dbMapper', () => {
     const row: SummaryRow = {
       year: 2024,
       month_label: 'June2024',
-      c_indiv_exp_a: '50000', d_indiv_exp_b: '60000',
-      e_shared_exp_a: '20000', f_shared_exp_b: '25000',
-      g_shared_exp_total: '45000',
-      h_shared_pct_a: '0.4444', i_shared_pct_b: '0.5556',
-      j_total_exp_a: '70000', k_total_exp_b: '85000',
-      l_indiv_inc_a: '360000', m_indiv_inc_b: '260000',
-      n_shared_inc_a: '9000', o_shared_inc_b: '21000',
-      p_income_pct_a: '0.3', q_income_pct_b: '0.7',
-      r_shared_inc_total: '30000',
-      s_total_inc_a: '369000', t_total_inc_b: '281000',
-      u_savings_a: '105500', v_savings_b: '189500',
-      w_household_savings: '-15000',
-      x_savings_pct_a: '0.2859', y_savings_pct_b: '0.6744',
-      z_household_savings_pct: '-0.5',
-      aa_settlement_a_to_b: '0', ab_settlement_b_to_a: '0',
+      individual_expenses_a: 50000, individual_expenses_b: 60000,
+      shared_expenses_a: 20000, shared_expenses_b: 25000,
+      shared_expenses_total: 45000,
+      shared_expenses_pct_a: 0.4444, shared_expenses_pct_b: 0.5556,
+      total_expenses_a: 70000, total_expenses_b: 85000,
+      individual_income_a: 360000, individual_income_b: 260000,
+      shared_income_a: 9000, shared_income_b: 21000,
+      income_pct_a: 0.3, income_pct_b: 0.7,
+      shared_income_total: 30000,
+      total_income_a: 369000, total_income_b: 281000,
+      savings_a: 105500, savings_b: 189500,
+      household_savings: -15000,
+      savings_pct_a: 0.2859, savings_pct_b: 0.6744,
+      household_savings_pct: -0.5,
+      settlement_a_to_b: 0, settlement_b_to_a: 0,
     };
 
     it('scales fractional percentages to whole numbers', () => {

@@ -26,7 +26,11 @@ export class DbSummaryRepository implements ISummaryRepository {
 
   async getCategoryTransactions(): Promise<CategoryTransaction[]> {
     const rows = await selectAll<SummaryByCategoryRow>(() =>
-      this.db.from('summary_by_categories').select('*').order('period', { ascending: true }),
+      this.db.from('summary_by_categories').select('*')
+        .order('period', { ascending: true })
+        .order('category', { ascending: true })
+        .order('user_id', { ascending: true })
+        .order('shared', { ascending: true }),
     );
     return rows.map(rowToCategoryTransaction);
   }

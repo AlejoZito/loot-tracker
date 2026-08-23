@@ -30,7 +30,7 @@ export class DbAppSettingsRepository implements IAppSettingsRepository {
       return typeof v === 'string' && v ? v : fallback;
     };
 
-    const currencies: CurrencyOption[] = (currencyRows as CurrencyRow[] ?? []).map(r => ({
+    const available: CurrencyOption[] = (currencyRows as CurrencyRow[] ?? []).map(r => ({
       code: r.code as Currency,
       name: r.name,
       symbol: r.symbol,
@@ -41,8 +41,8 @@ export class DbAppSettingsRepository implements IAppSettingsRepository {
       mainCurrency: str('main_currency', 'USD') as Currency,
       defaultExpenseCurrency: str('default_expense_currency', 'ARS') as Currency,
       locale: str('locale', 'es-AR'),
-      currencies: currencies.length > 0
-        ? currencies
+      availableCurrencies: available.length > 0
+        ? available
         : [{ code: 'ARS', name: 'Argentine Peso', symbol: '$', decimalPlaces: 2 }],
     };
   }

@@ -288,8 +288,6 @@ const INSTALLMENT_COLUMNS = {
   type: 8,
   shared: 9,
   user: 10,
-  usdCurrentMonth: 11,
-  usdOrigin: 12,
 } as const;
 
 export function rowToInstallmentExpense(row: string[]): InstallmentExpense | null {
@@ -300,20 +298,24 @@ export function rowToInstallmentExpense(row: string[]): InstallmentExpense | nul
   if (!periodIso || !originIso) return null;
   const rawType = (row[INSTALLMENT_COLUMNS.type] || '').toLowerCase();
   const type = rawType === 'ingreso' ? 'income' : 'expense';
+  const period = DomainDate.fromISO(periodIso);
+  const origin = DomainDate.fromISO(originIso);
+  // The tab has no installment-number column, so it comes from the gap between the two dates.
+  const installmentNumber =
+    (period.year * 12 + period.month) - (origin.year * 12 + origin.month) + 1;
   return new InstallmentExpense(
     id,
-    DomainDate.fromISO(periodIso),
-    DomainDate.fromISO(originIso),
+    period,
+    origin,
     row[INSTALLMENT_COLUMNS.category] || '',
     parseSheetCurrency(row[INSTALLMENT_COLUMNS.installmentAmount]),
     Number(row[INSTALLMENT_COLUMNS.installments]) || 1,
+    installmentNumber,
     (row[INSTALLMENT_COLUMNS.currency] || 'ARS') as 'ARS' | 'USD',
     row[INSTALLMENT_COLUMNS.notes] || '',
     type,
     (row[INSTALLMENT_COLUMNS.shared] || '').toLowerCase() === 'si',
     row[INSTALLMENT_COLUMNS.user] || '',
-    parseSheetCurrency(row[INSTALLMENT_COLUMNS.usdCurrentMonth]),
-    parseSheetCurrency(row[INSTALLMENT_COLUMNS.usdOrigin]),
   );
 }
 

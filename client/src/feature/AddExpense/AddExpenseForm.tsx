@@ -20,7 +20,7 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
   const isEditing = Boolean(id);
   const npc = useDialogNPC();
   const isOnline = useOnlineStatus();
-  const { config, currencySymbol } = useBudgetConfig();
+  const { config } = useBudgetConfig();
   const defaultUserId = config.users[0]?.id ?? '';
 
   const [allCategories, setAllCategories] = useState<Category[]>([]);
@@ -247,7 +247,7 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
               <div className="amount-input-group flex gap-2">
                 <div className="amount-input-wrapper relative flex-1">
                   <span className="amount-currency-symbol currency-prefix">
-                    {currencySymbol(currency)}
+                    {config.availableCurrencies.find((c) => c.code === currency)?.symbol ?? currency}
                   </span>
                   <input
                     type="number"
@@ -279,8 +279,8 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
 
             <fieldset className="currency-field space-y-1.5">
               <label className="currency-label field-label">Moneda</label>
-              <div className={cn('currency-options grid gap-3', config.currencies.length > 3 ? 'grid-cols-4' : 'grid-cols-3')}>
-                {config.currencies.map(({ code }) => (
+              <div className={cn('currency-options grid gap-3', config.availableCurrencies.length > 3 ? 'grid-cols-4' : 'grid-cols-3')}>
+                {config.availableCurrencies.map(({ code }) => (
                   <button
                     key={code}
                     type="button"

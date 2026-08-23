@@ -11,7 +11,8 @@ export class DbCategoryRepository implements ICategoryRepository {
     const rows = await selectAll<CategoryRow>(() =>
       this.db.from('categories').select('*')
         .order('sort_order', { ascending: true })
-        .order('name', { ascending: true }),
+        .order('name', { ascending: true })
+        .order('id', { ascending: true }),
     );
     return rows.map(rowToCategory);
   }

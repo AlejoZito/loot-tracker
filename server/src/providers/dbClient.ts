@@ -42,6 +42,9 @@ export function resetDbClient(): void {
 /**
  * PostgREST caps a request at 1000 rows silently, so any full-table read must page or it
  * truncates without erroring. Pages until a short read.
+ *
+ * The query must carry an ordering unique across rows; paging a non-unique sort lets the
+ * database return a row twice, or not at all, across two pages.
  */
 export async function selectAll<T>(
   build: () => { range: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }> },

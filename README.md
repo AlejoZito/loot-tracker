@@ -66,9 +66,6 @@ vercel integration add supabase
 vercel env pull
 
 # 2. apply supabase/migrations/*.sql to the database
-
-# 3. import your existing sheet data (idempotent, safe to re-run)
-MIGRATE_FROM=google-sheets npm run migrate:db --prefix server
 ```
 
 This is the only mode where **the app computes its own numbers**. `summary`,

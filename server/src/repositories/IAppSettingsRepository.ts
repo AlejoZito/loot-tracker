@@ -9,14 +9,14 @@ export interface CurrencyOption {
 
 /**
  * `mainCurrency` is what every summary figure and installment conversion is expressed in.
- * `currencies` is the set offered when recording an expense. These are separate concerns:
+ * `availableCurrencies` is the set offered when recording an expense. Separate concerns:
  * the currency you spend in is not the one you report in.
  */
 export interface AppSettings {
   mainCurrency: Currency;
   defaultExpenseCurrency: Currency;
   locale: string;
-  currencies: CurrencyOption[];
+  availableCurrencies: CurrencyOption[];
 }
 
 export interface IAppSettingsRepository {

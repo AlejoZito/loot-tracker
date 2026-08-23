@@ -12,8 +12,8 @@ export async function getHabitsForDay(day: string): Promise<Habit[]> {
   return habitRepository.getByDay(day);
 }
 
-export async function getRecentHabits(days: number): Promise<Habit[]> {
-  return habitRepository.getRecent(days);
+export async function getRecentHabits(days: number, today: string): Promise<Habit[]> {
+  return habitRepository.getRecent(days, today);
 }
 
 export function getHabitMonthSummary(

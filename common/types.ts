@@ -125,8 +125,6 @@ export interface InstallmentExpense {
   type: TransactionType;
   shared: boolean;
   user: string;
-  usdCurrentMonth: number;   // USD at installment month's exchange rate
-  usdOrigin: number;         // USD at original purchase month's exchange rate
 }
 
 export interface LoginRequest {
@@ -149,14 +147,14 @@ export interface CurrencyOption {
 /**
  * Public, auth-protected app configuration.
  *
- * `mainCurrency` is what every summary figure is denominated in; `currencies` is the set
- * offered when recording an expense. These are separate: the currency you spend in is not
- * the one you report in.
+ * `mainCurrency` is what every summary figure is denominated in; `availableCurrencies` is
+ * the set offered when recording an expense. These are separate: the currency you spend in
+ * is not the one you report in.
  */
 export interface AppConfig {
   users: { slot: 'userA' | 'userB'; id: string; label: string }[];
   mainCurrency: Currency;
   defaultExpenseCurrency: Currency;
   locale: string;
-  currencies: CurrencyOption[];
+  availableCurrencies: CurrencyOption[];
 }

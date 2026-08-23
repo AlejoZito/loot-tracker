@@ -16,7 +16,7 @@ router.get('/', async (_req: AuthRequest, res: Response) => {
       mainCurrency: settings.mainCurrency,
       defaultExpenseCurrency: settings.defaultExpenseCurrency,
       locale: settings.locale,
-      currencies: settings.currencies,
+      availableCurrencies: settings.availableCurrencies,
     };
     res.json(config);
   } catch (error) {

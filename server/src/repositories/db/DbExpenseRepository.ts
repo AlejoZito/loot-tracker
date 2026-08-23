@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { selectAll } from '../../providers/dbClient';
-import { rowToExpense, expenseToRow, dateTimeToDb, type ExpenseRow } from '../../mappers/dbMapper';
+import { rowToExpense, expenseToRow, dateTimeToDb, EXPENSE_COLUMNS, type ExpenseRow } from '../../mappers/dbMapper';
 import type { IExpenseRepository } from '../IExpenseRepository';
 import { Expense } from '../../domain/expense';
 
@@ -24,7 +24,9 @@ export class DbExpenseRepository implements IExpenseRepository {
 
   async getAll(): Promise<Expense[]> {
     const rows = await selectAll<ExpenseRow>(() =>
-      this.db.from('expenses').select('*').order('occurred_at', { ascending: true }),
+      this.db.from('expenses').select(EXPENSE_COLUMNS)
+        .order('occurred_at', { ascending: true })
+        .order('id', { ascending: true }),
     );
     return rows.map(rowToExpense);
   }
@@ -33,7 +35,7 @@ export class DbExpenseRepository implements IExpenseRepository {
     const row = expenseToRow(expense as Expense);
     if (!row.id) delete row.id;
 
-    const { data, error } = await this.db.from('expenses').insert(row).select().single();
+    const { data, error } = await this.db.from('expenses').insert(row).select(EXPENSE_COLUMNS).single();
     if (error) throw new Error(`Failed to create expense: ${error.message}`);
     return rowToExpense(data as ExpenseRow);
   }
@@ -43,7 +45,7 @@ export class DbExpenseRepository implements IExpenseRepository {
     row.updated_at = new Date().toISOString();
 
     const { data, error } = await this.db
-      .from('expenses').update(row).eq('id', id).select().maybeSingle();
+      .from('expenses').update(row).eq('id', id).select(EXPENSE_COLUMNS).maybeSingle();
     if (error) throw new Error(`Failed to update expense ${id}: ${error.message}`);
     if (!data) return null;
     return rowToExpense(data as ExpenseRow);

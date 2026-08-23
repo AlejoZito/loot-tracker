@@ -13,15 +13,17 @@ import { Period } from '../domain/period';
 /**
  * Row -> domain mappers for the `db` datasource.
  *
- * PostgREST serialises `numeric` as a JSON *string* to avoid float precision loss, so
- * every money column needs an explicit parse.
+ * Money arrives as a JSON number because the views cast it to `double precision` and
+ * `EXPENSE_COLUMNS` casts `expenses.amount`. PostgREST would otherwise serialise
+ * `numeric` as a string, which concatenates instead of summing.
  */
 
-/** Parse a PostgREST numeric (string) or number into a number. */
-function num(v: unknown): number {
-  if (v === null || v === undefined) return 0;
-  const n = typeof v === 'number' ? v : parseFloat(String(v));
-  return Number.isFinite(n) ? n : 0;
+/** Columns to read `expenses` with. The cast is what keeps `amount` a number. */
+export const EXPENSE_COLUMNS =
+  'id,occurred_at,category,amount:amount::float8,installments,currency,notes,type,shared,user_id';
+
+function num(v: number | null | undefined): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : 0;
 }
 
 /** Parse 'YYYY-MM-DD' (a Postgres `date`) into the domain Date. */
@@ -55,7 +57,7 @@ export interface ExpenseRow {
   id: string;
   occurred_at: string;
   category: string;
-  amount: string | number;
+  amount: number;
   installments: number;
   currency: string;
   notes: string | null;
@@ -86,52 +88,46 @@ export interface HabitRow {
   value: boolean;
 }
 
+/** A row of `expenses_by_installments`: only what is specific to one installment. */
 export interface InstallmentRow {
   expense_id: string;
-  category: string;
-  installments: number;
   installment_number: number;
-  notes: string | null;
-  type: string;
-  shared: boolean;
-  user_id: string;
-  period_date: string;
+  installment_amount: number;
   origin_month: string;
-  amount_local: string | number;
-  currency_local: string;
-  amount_at_period: string | number;
-  amount_at_origin: string | number;
+  period_month: string;
+  period_key: string;
+  period_date: string;
 }
 
 export interface SummaryRow {
   year: number;
   month_label: string;
-  c_indiv_exp_a: string | number;
-  d_indiv_exp_b: string | number;
-  e_shared_exp_a: string | number;
-  f_shared_exp_b: string | number;
-  g_shared_exp_total: string | number;
-  h_shared_pct_a: string | number;
-  i_shared_pct_b: string | number;
-  j_total_exp_a: string | number;
-  k_total_exp_b: string | number;
-  l_indiv_inc_a: string | number;
-  m_indiv_inc_b: string | number;
-  n_shared_inc_a: string | number;
-  o_shared_inc_b: string | number;
-  p_income_pct_a: string | number;
-  q_income_pct_b: string | number;
-  r_shared_inc_total: string | number;
-  s_total_inc_a: string | number;
-  t_total_inc_b: string | number;
-  u_savings_a: string | number;
-  v_savings_b: string | number;
-  w_household_savings: string | number;
-  x_savings_pct_a: string | number;
-  y_savings_pct_b: string | number;
-  z_household_savings_pct: string | number;
-  aa_settlement_a_to_b: string | number;
-  ab_settlement_b_to_a: string | number;
+  individual_expenses_a: number;
+  individual_expenses_b: number;
+  shared_expenses_a: number;
+  shared_expenses_b: number;
+  shared_expenses_total: number;
+  shared_expenses_pct_a: number;
+  shared_expenses_pct_b: number;
+  total_expenses_a: number;
+  total_expenses_b: number;
+  individual_income_a: number;
+  individual_income_b: number;
+  shared_income_a: number;
+  shared_income_b: number;
+  income_pct_a: number;
+  income_pct_b: number;
+  shared_income_total: number;
+  total_income_a: number;
+  total_income_b: number;
+  savings_a: number;
+  savings_b: number;
+  household_savings: number;
+  savings_pct_a: number;
+  savings_pct_b: number;
+  household_savings_pct: number;
+  settlement_a_to_b: number;
+  settlement_b_to_a: number;
 }
 
 export interface SummaryByCategoryRow {
@@ -140,7 +136,7 @@ export interface SummaryByCategoryRow {
   user_id: string;
   shared: boolean;
   period: string;
-  amount: string | number;
+  amount: number;
 }
 
 // ─────────────────────────── mappers ───────────────────────────
@@ -193,21 +189,21 @@ export function rowToHabit(row: HabitRow): Habit {
   return new Habit(toDomainDate(row.day), row.category_id, !!row.value, row.user_id || '');
 }
 
-export function rowToInstallmentExpense(row: InstallmentRow): InstallmentExpense {
+/** The installment row carries no expense attributes, so its parent supplies them. */
+export function rowToInstallmentExpense(row: InstallmentRow, expense: Expense): InstallmentExpense {
   return new InstallmentExpense(
     row.expense_id,
     toDomainDate(row.period_date),
     toDomainDate(row.origin_month),
-    row.category,
-    num(row.amount_local),
-    row.installments || 1,
-    row.currency_local as Currency,
-    row.notes || '',
-    row.type as TransactionType,
-    !!row.shared,
-    row.user_id || '',
-    num(row.amount_at_period),
-    num(row.amount_at_origin),
+    expense.category,
+    num(row.installment_amount),
+    expense.installments || 1,
+    row.installment_number || 1,
+    expense.currency,
+    expense.notes,
+    expense.type,
+    expense.shared,
+    expense.user || '',
   );
 }
 
@@ -227,23 +223,23 @@ export function rowToCategoryTransaction(row: SummaryByCategoryRow): CategoryTra
  * as the sheet datasources produce. Removing the scaling breaks parity between them.
  */
 export function rowToMonthlySummary(row: SummaryRow): MonthlySummary {
-  const pct = (v: unknown) => num(v) * 100;
+  const pct = (v: number) => num(v) * 100;
   return new MonthlySummary(
     row.year,
     row.month_label,
-    { userA: num(row.c_indiv_exp_a), userB: num(row.d_indiv_exp_b) },
-    { userA: num(row.e_shared_exp_a), userB: num(row.f_shared_exp_b), total: num(row.g_shared_exp_total) },
-    { userA: pct(row.h_shared_pct_a), userB: pct(row.i_shared_pct_b) },
-    { userA: num(row.j_total_exp_a), userB: num(row.k_total_exp_b) },
-    { userA: num(row.l_indiv_inc_a), userB: num(row.m_indiv_inc_b) },
-    { userA: num(row.n_shared_inc_a), userB: num(row.o_shared_inc_b) },
-    { userA: pct(row.p_income_pct_a), userB: pct(row.q_income_pct_b) },
-    num(row.r_shared_inc_total),
-    { userA: num(row.s_total_inc_a), userB: num(row.t_total_inc_b) },
-    { userA: num(row.u_savings_a), userB: num(row.v_savings_b) },
-    num(row.w_household_savings),
-    { userA: pct(row.x_savings_pct_a), userB: pct(row.y_savings_pct_b) },
-    pct(row.z_household_savings_pct),
-    { aToB: num(row.aa_settlement_a_to_b), bToA: num(row.ab_settlement_b_to_a) },
+    { userA: num(row.individual_expenses_a), userB: num(row.individual_expenses_b) },
+    { userA: num(row.shared_expenses_a), userB: num(row.shared_expenses_b), total: num(row.shared_expenses_total) },
+    { userA: pct(row.shared_expenses_pct_a), userB: pct(row.shared_expenses_pct_b) },
+    { userA: num(row.total_expenses_a), userB: num(row.total_expenses_b) },
+    { userA: num(row.individual_income_a), userB: num(row.individual_income_b) },
+    { userA: num(row.shared_income_a), userB: num(row.shared_income_b) },
+    { userA: pct(row.income_pct_a), userB: pct(row.income_pct_b) },
+    num(row.shared_income_total),
+    { userA: num(row.total_income_a), userB: num(row.total_income_b) },
+    { userA: num(row.savings_a), userB: num(row.savings_b) },
+    num(row.household_savings),
+    { userA: pct(row.savings_pct_a), userB: pct(row.savings_pct_b) },
+    pct(row.household_savings_pct),
+    { aToB: num(row.settlement_a_to_b), bToA: num(row.settlement_b_to_a) },
   );
 }

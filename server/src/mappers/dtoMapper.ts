@@ -77,8 +77,6 @@ export function monthlySummaryToDto(s: MonthlySummary): SummaryMonth {
 }
 
 export function installmentExpenseToDto(e: InstallmentExpense): InstallmentExpenseDto {
-  const periodMonths = e.period.year * 12 + e.period.month;
-  const originMonths = e.originPeriod.year * 12 + e.originPeriod.month;
   return {
     id: e.id,
     period: e.period.toISO(),
@@ -86,14 +84,12 @@ export function installmentExpenseToDto(e: InstallmentExpense): InstallmentExpen
     category: e.category,
     installmentAmount: e.installmentAmount,
     installments: e.installments,
-    installmentNumber: periodMonths - originMonths + 1,
+    installmentNumber: e.installmentNumber,
     currency: e.currency,
     notes: e.notes,
     type: e.type,
     shared: e.shared,
     user: e.user,
-    usdCurrentMonth: e.usdCurrentMonth,
-    usdOrigin: e.usdOrigin,
   };
 }
 

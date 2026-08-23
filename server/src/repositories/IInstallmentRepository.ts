@@ -3,7 +3,7 @@ import type { InstallmentExpense } from '../domain/installmentExpense';
 /**
  * Read-only access to the installment expansion, one row per purchase per installment
  * month. It is derived from `expenses` in every datasource and must never be written to
- * directly. `month` is 'YYYY-MM'.
+ * directly. `month` is 'YYYY-MM'. Every method returns newest installment first.
  */
 export interface IInstallmentRepository {
   getByCategory(category: string, user?: string): Promise<InstallmentExpense[]>;

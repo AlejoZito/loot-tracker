@@ -13,13 +13,6 @@ function nextMonthStart(year: number, month: number): string {
   return `${y}-${String(m).padStart(2, '0')}-01`;
 }
 
-/** Local wall-clock 'YYYY-MM-DD', N days back from today. */
-function isoDaysAgo(days: number): string {
-  const d = new globalThis.Date();
-  d.setDate(d.getDate() - days);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 export class DbHabitRepository implements IHabitRepository {
   constructor(private readonly db: SupabaseClient) {}
 
@@ -35,14 +28,19 @@ export class DbHabitRepository implements IHabitRepository {
     const rows = await selectAll<HabitRow>(() =>
       this.db.from('habits').select('*')
         .gte('day', from).lt('day', nextMonthStart(year, month))
-        .order('day', { ascending: true }),
+        .order('day', { ascending: true })
+        .order('category_id', { ascending: true })
+        .order('user_id', { ascending: true }),
     );
     return rows.map(rowToHabit);
   }
 
   async getAll(): Promise<Habit[]> {
     const rows = await selectAll<HabitRow>(() =>
-      this.db.from('habits').select('*').order('day', { ascending: true }),
+      this.db.from('habits').select('*')
+        .order('day', { ascending: true })
+        .order('category_id', { ascending: true })
+        .order('user_id', { ascending: true }),
     );
     return rows.map(rowToHabit);
   }
@@ -54,13 +52,15 @@ export class DbHabitRepository implements IHabitRepository {
     return rows.map(rowToHabit);
   }
 
-  async getRecent(days: number): Promise<Habit[]> {
-    // `days` counts calendar days including today, so the cutoff is days-1 back.
+  async getRecent(days: number, today: string): Promise<Habit[]> {
+    // `days` counts calendar days including today, so the window starts days-1 back.
+    const from = DomainDate.fromISO(today).minusDays(Math.max(days - 1, 0)).toISO();
     const rows = await selectAll<HabitRow>(() =>
       this.db.from('habits').select('*')
-        .gte('day', isoDaysAgo(Math.max(days - 1, 0)))
-        .lte('day', isoDaysAgo(0))
-        .order('day', { ascending: true }),
+        .gte('day', from).lte('day', today)
+        .order('day', { ascending: true })
+        .order('category_id', { ascending: true })
+        .order('user_id', { ascending: true }),
     );
     return rows.map(rowToHabit);
   }
