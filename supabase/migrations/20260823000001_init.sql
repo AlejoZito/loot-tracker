@@ -3,17 +3,9 @@
 -- Single-household by design: no household_id, no tenancy.
 --
 -- Values are canonical English. The Spanish enums the sheet backends use
--- (Ingreso/Egreso, Si/No) are translated at the sheet mapper and in the backfill
--- script, never stored here.
+-- (Ingreso/Egreso, Si/No) are translated at the sheet mapper, never stored here.
 
 -- ─────────────────────────── configuration ───────────────────────────
-
-create table app_config (
-  key         text primary key,
-  value       jsonb       not null,
-  description text,
-  updated_at  timestamptz not null default now()
-);
 
 create table currencies (
   code           text primary key,                    -- ISO 4217
@@ -22,6 +14,53 @@ create table currencies (
   decimal_places smallint not null default 2,
   enabled        boolean  not null default true,
   sort_order     smallint not null default 0
+);
+
+-- Every setting the app understands. A type rather than free text because the reporting
+-- views select each of these by name: a misspelled key then fails `create view` instead
+-- of returning null and silently taking a default branch.
+--
+-- Adding a key: `alter type ... add value` must land in its own migration, ahead of the
+-- one that inserts it — Postgres will not let a value be used in the transaction that
+-- creates it. Values cannot be dropped, only renamed.
+create type app_config_key as enum (
+  'main_currency',
+  'default_expense_currency',
+  'locale',
+  'timezone',
+  'shared_split_mode',
+  'rate_fallback_policy',
+  'installment_date_mode',
+  'settlement_enabled'
+);
+
+create table app_config (
+  key         app_config_key primary key,
+  value       jsonb          not null,
+  description text,
+  updated_at  timestamptz    not null default now(),
+
+  -- Carries the value of the two currency settings and null for every other key, so that
+  -- a currency the household does not have cannot be named as the reporting currency.
+  currency_ref text generated always as (
+    case when key in ('main_currency', 'default_expense_currency') then value #>> '{}' end
+  ) stored references currencies(code),
+
+  -- `else false` is deliberate: a key added to the enum cannot be stored until its
+  -- accepted values are declared here.
+  constraint app_config_value_valid check (
+    case key
+      when 'main_currency'            then jsonb_typeof(value) = 'string'
+      when 'default_expense_currency' then jsonb_typeof(value) = 'string'
+      when 'locale'                   then jsonb_typeof(value) = 'string'
+      when 'timezone'                 then jsonb_typeof(value) = 'string'
+      when 'shared_split_mode'        then value #>> '{}' in ('income_proportional', 'equal')
+      when 'rate_fallback_policy'     then value #>> '{}' in ('nearest_preceding', 'latest', 'none')
+      when 'installment_date_mode'    then value #>> '{}' in ('clamp', 'legacy_overflow')
+      when 'settlement_enabled'       then jsonb_typeof(value) = 'boolean'
+      else false
+    end
+  )
 );
 
 -- Maps a budget-user id to a fixed household slot. Only non-null slots participate in
@@ -49,9 +88,16 @@ create index categories_name_idx on categories (name);
 
 create table expenses (
   id           text          primary key default gen_random_uuid()::text,
-  -- Wall-clock, not timestamptz: the value carries no zone, and converting one would
-  -- move an expense at 2024-06-30 22:00 ART into July's summary.
-  occurred_at  timestamp     not null,
+  occurred_at  timestamptz   not null,
+
+  -- The household's own calendar, derived once here rather than in each reporting view.
+  -- The zone literal is a deployment property and must match app_config.timezone;
+  -- changing it moves late-evening expenses between monthly summaries.
+  occurred_local timestamp generated always as
+    (occurred_at at time zone 'America/Argentina/Buenos_Aires') stored,
+  period         date      generated always as
+    (date_trunc('month', occurred_at at time zone 'America/Argentina/Buenos_Aires')::date) stored,
+
   -- Category name, not an FK: names are the join key, and data contains names with
   -- no matching category row.
   category     text          not null,
@@ -65,9 +111,9 @@ create table expenses (
   created_at   timestamptz   not null default now(),
   updated_at   timestamptz   not null default now()
 );
-create index expenses_occurred_at_idx on expenses (occurred_at);
-create index expenses_user_id_idx     on expenses (user_id);
-create index expenses_category_idx    on expenses (category);
+create index expenses_period_idx   on expenses (period);
+create index expenses_user_id_idx  on expenses (user_id);
+create index expenses_category_idx on expenses (category);
 
 create table habit_categories (
   id            text primary key,

@@ -18,9 +18,13 @@ import { Period } from '../domain/period';
  * `numeric` as a string, which concatenates instead of summing.
  */
 
-/** Columns to read `expenses` with. The cast is what keeps `amount` a number. */
+/**
+ * Columns to read `expenses` with. The cast is what keeps `amount` a number, and
+ * `occurred_local` is the generated household-local wall clock — reading `occurred_at`
+ * instead would render the instant in the database session's zone, not the household's.
+ */
 export const EXPENSE_COLUMNS =
-  'id,occurred_at,category,amount:amount::float8,installments,currency,notes,type,shared,user_id';
+  'id,occurred_local,category,amount:amount::float8,installments,currency,notes,type,shared,user_id';
 
 function num(v: number | null | undefined): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : 0;
@@ -45,22 +49,40 @@ function toDateTime(v: string | null | undefined): DateTime {
   return new DateTime(y || 0, m || 0, d || 0, h || 0, min || 0, sec || 0);
 }
 
-/** Serialise a DateTime back to the wall-clock format Postgres accepts for `timestamp`. */
-export function dateTimeToDb(dt: DateTime): string {
+/**
+ * Serialise a DateTime for the `occurred_at` timestamptz column. The zone name is part
+ * of the literal: without it Postgres resolves the wall clock against the session's
+ * zone, which is UTC, and the row lands hours away from when it happened.
+ */
+export function dateTimeToDb(dt: DateTime, timezone: string): string {
   const p = (n: number) => String(n).padStart(2, '0');
-  return `${dt.year}-${p(dt.month)}-${p(dt.day)}T${p(dt.hour)}:${p(dt.minute)}:${p(dt.second)}`;
+  return `${dt.year}-${p(dt.month)}-${p(dt.day)} ${p(dt.hour)}:${p(dt.minute)}:${p(dt.second)} ${timezone}`;
 }
 
 // ─────────────────────────── row shapes ───────────────────────────
 
 export interface ExpenseRow {
   id: string;
-  occurred_at: string;
+  occurred_local: string;
   category: string;
   amount: number;
   installments: number;
   currency: string;
   notes: string | null;
+  type: string;
+  shared: boolean;
+  user_id: string;
+}
+
+/** What a write sends: the instant, not the generated local columns. */
+export interface ExpenseWrite {
+  id?: string;
+  occurred_at: string;
+  category: string;
+  amount: number;
+  installments: number;
+  currency: string;
+  notes: string;
   type: string;
   shared: boolean;
   user_id: string;
@@ -144,7 +166,7 @@ export interface SummaryByCategoryRow {
 export function rowToExpense(row: ExpenseRow): Expense {
   return new Expense(
     row.id,
-    toDateTime(row.occurred_at),
+    toDateTime(row.occurred_local),
     row.category,
     num(row.amount),
     row.installments || 1,
@@ -156,10 +178,10 @@ export function rowToExpense(row: ExpenseRow): Expense {
   );
 }
 
-export function expenseToRow(e: Expense): Omit<ExpenseRow, 'id'> & { id?: string } {
+export function expenseToRow(e: Expense, timezone: string): ExpenseWrite {
   return {
     id: e.id || undefined,
-    occurred_at: dateTimeToDb(e.date),
+    occurred_at: dateTimeToDb(e.date, timezone),
     category: e.category,
     amount: e.amount,
     installments: e.installments || 1,

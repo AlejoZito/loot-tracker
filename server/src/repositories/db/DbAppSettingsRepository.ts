@@ -41,6 +41,7 @@ export class DbAppSettingsRepository implements IAppSettingsRepository {
       mainCurrency: str('main_currency', 'USD') as Currency,
       defaultExpenseCurrency: str('default_expense_currency', 'ARS') as Currency,
       locale: str('locale', 'es-AR'),
+      timezone: str('timezone', 'America/Argentina/Buenos_Aires'),
       availableCurrencies: available.length > 0
         ? available
         : [{ code: 'ARS', name: 'Argentine Peso', symbol: '$', decimalPlaces: 2 }],

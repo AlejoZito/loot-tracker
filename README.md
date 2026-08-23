@@ -65,7 +65,8 @@ npm i -g vercel && vercel link
 vercel integration add supabase
 vercel env pull
 
-# 2. apply supabase/migrations/*.sql to the database
+# 2. set your household timezone in supabase/migrations/*_init.sql (it defaults to
+#    America/Argentina/Buenos_Aires) and apply supabase/migrations/*.sql
 ```
 
 This is the only mode where **the app computes its own numbers**. `summary`,

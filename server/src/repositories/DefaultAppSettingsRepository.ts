@@ -12,6 +12,7 @@ export class DefaultAppSettingsRepository implements IAppSettingsRepository {
       mainCurrency: 'USD',
       defaultExpenseCurrency: 'ARS',
       locale: 'es-AR',
+      timezone: 'America/Argentina/Buenos_Aires',
       availableCurrencies: [
         { code: 'ARS', name: 'Argentine Peso', symbol: '$', decimalPlaces: 2 },
         { code: 'USD', name: 'US Dollar', symbol: 'US$', decimalPlaces: 2 },

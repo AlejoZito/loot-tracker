@@ -20,7 +20,7 @@ import { DateTime } from '../../../server/src/domain/dateTime';
 
 const expenseRow: ExpenseRow = {
   id: 'exp-1',
-  occurred_at: '2024-06-20T14:30:00',
+  occurred_local: '2024-06-20T14:30:00',
   category: 'Supermercado',
   amount: 15000,
   installments: 1,
@@ -45,6 +45,13 @@ describe('dbMapper', () => {
   });
 
   describe('timestamp handling', () => {
+    it('reads the generated local column, not the instant', () => {
+      // occurred_at renders in the database session's zone (UTC); occurred_local is
+      // already the household's wall clock.
+      expect(EXPENSE_COLUMNS).toContain('occurred_local');
+      expect(EXPENSE_COLUMNS).not.toContain('occurred_at');
+    });
+
     it('reads a wall-clock timestamp without applying a timezone', () => {
       const e = rowToExpense(expenseRow);
       expect(e.date.toISO()).toBe('2024-06-20');
@@ -55,24 +62,26 @@ describe('dbMapper', () => {
     it('keeps a late-evening expense in its own calendar month', () => {
       // A Date() round-trip on a zone-less timestamp shifts this into July, putting the
       // row in the wrong monthly summary.
-      const e = rowToExpense({ ...expenseRow, occurred_at: '2024-06-30T22:00:00' });
+      const e = rowToExpense({ ...expenseRow, occurred_local: '2024-06-30T22:00:00' });
       expect(e.date.toISO()).toBe('2024-06-30');
     });
 
     it('accepts a space separator as well as T', () => {
-      const e = rowToExpense({ ...expenseRow, occurred_at: '2024-06-20 14:30:00' });
+      const e = rowToExpense({ ...expenseRow, occurred_local: '2024-06-20 14:30:00' });
       expect(e.date.toISO()).toBe('2024-06-20');
       expect(e.date.hour).toBe(14);
     });
 
-    it('round-trips through dateTimeToDb', () => {
+    it('names the zone in the written literal', () => {
+      // Without it Postgres resolves the wall clock against the session zone (UTC) and
+      // stores an instant hours away from when the expense happened.
       const dt = new DateTime(2024, 6, 20, 14, 30, 5);
-      expect(dateTimeToDb(dt)).toBe('2024-06-20T14:30:05');
-      expect(rowToExpense({ ...expenseRow, occurred_at: dateTimeToDb(dt) }).date.equals(dt)).toBe(true);
+      expect(dateTimeToDb(dt, 'America/Argentina/Buenos_Aires'))
+        .toBe('2024-06-20 14:30:05 America/Argentina/Buenos_Aires');
     });
 
     it('pads single-digit components when writing', () => {
-      expect(dateTimeToDb(new DateTime(2024, 1, 5, 9, 8, 7))).toBe('2024-01-05T09:08:07');
+      expect(dateTimeToDb(new DateTime(2024, 1, 5, 9, 8, 7), 'UTC')).toBe('2024-01-05 09:08:07 UTC');
     });
   });
 
@@ -104,9 +113,9 @@ describe('dbMapper', () => {
         'exp-9', DateTime.fromISO('2024-06-20'), 'Transporte', 3000, 1,
         'ARS', 'bus', 'expense', false, 'user-b',
       );
-      const row = expenseToRow(e);
+      const row = expenseToRow(e, 'America/Argentina/Buenos_Aires');
       expect(row.user_id).toBe('user-b');
-      expect(row.occurred_at).toBe('2024-06-20T00:00:00');
+      expect(row.occurred_at).toBe('2024-06-20 00:00:00 America/Argentina/Buenos_Aires');
       expect(row.amount).toBe(3000);
       expect(row.shared).toBe(false);
     });

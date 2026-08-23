@@ -2,12 +2,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { selectAll } from '../../providers/dbClient';
 import { rowToExpense, expenseToRow, dateTimeToDb, EXPENSE_COLUMNS, type ExpenseRow } from '../../mappers/dbMapper';
 import type { IExpenseRepository } from '../IExpenseRepository';
+import type { IAppSettingsRepository } from '../IAppSettingsRepository';
 import { Expense } from '../../domain/expense';
 
 /** Map a Partial<Expense> to a partial row, including only the keys actually provided. */
-function updatesToRow(updates: Partial<Expense>): Record<string, unknown> {
+function updatesToRow(updates: Partial<Expense>, timezone: string): Record<string, unknown> {
   const row: Record<string, unknown> = {};
-  if (updates.date !== undefined) row.occurred_at = dateTimeToDb(updates.date);
+  if (updates.date !== undefined) row.occurred_at = dateTimeToDb(updates.date, timezone);
   if (updates.category !== undefined) row.category = updates.category;
   if (updates.amount !== undefined) row.amount = updates.amount;
   if (updates.installments !== undefined) row.installments = updates.installments;
@@ -20,7 +21,18 @@ function updatesToRow(updates: Partial<Expense>): Record<string, unknown> {
 }
 
 export class DbExpenseRepository implements IExpenseRepository {
-  constructor(private readonly db: SupabaseClient) {}
+  private timezone: string | null = null;
+
+  constructor(
+    private readonly db: SupabaseClient,
+    private readonly settings: IAppSettingsRepository,
+  ) {}
+
+  /** Writes need the household zone to resolve a wall clock into an instant. */
+  private async zone(): Promise<string> {
+    if (this.timezone === null) this.timezone = (await this.settings.get()).timezone;
+    return this.timezone;
+  }
 
   async getAll(): Promise<Expense[]> {
     const rows = await selectAll<ExpenseRow>(() =>
@@ -32,7 +44,7 @@ export class DbExpenseRepository implements IExpenseRepository {
   }
 
   async create(expense: Omit<Expense, 'id'> & { id?: string }): Promise<Expense> {
-    const row = expenseToRow(expense as Expense);
+    const row = expenseToRow(expense as Expense, await this.zone());
     if (!row.id) delete row.id;
 
     const { data, error } = await this.db.from('expenses').insert(row).select(EXPENSE_COLUMNS).single();
@@ -41,7 +53,7 @@ export class DbExpenseRepository implements IExpenseRepository {
   }
 
   async update(id: string, updates: Partial<Expense>): Promise<Expense | null> {
-    const row = updatesToRow(updates);
+    const row = updatesToRow(updates, await this.zone());
     row.updated_at = new Date().toISOString();
 
     const { data, error } = await this.db

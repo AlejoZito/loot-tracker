@@ -32,8 +32,12 @@ import { DbInstallmentRepository } from './db/DbInstallmentRepository';
 const useDb = dataSource === 'db';
 const db = useDb ? getDb() : null;
 
+/** Sheet backends have nowhere to store settings, so they get frozen historical defaults. */
+export const appSettingsRepository: IAppSettingsRepository =
+  db ? new DbAppSettingsRepository(db) : new DefaultAppSettingsRepository();
+
 export const expenseRepository: IExpenseRepository =
-  db ? new DbExpenseRepository(db) : sheetExpenses;
+  db ? new DbExpenseRepository(db, appSettingsRepository) : sheetExpenses;
 
 export const categoryRepository: ICategoryRepository =
   db ? new DbCategoryRepository(db) : sheetCategories;
@@ -46,7 +50,3 @@ export const summaryRepository: ISummaryRepository =
 
 export const installmentRepository: IInstallmentRepository =
   db ? new DbInstallmentRepository(db) : sheetInstallments;
-
-/** Sheet backends have nowhere to store settings, so they get frozen historical defaults. */
-export const appSettingsRepository: IAppSettingsRepository =
-  db ? new DbAppSettingsRepository(db) : new DefaultAppSettingsRepository();

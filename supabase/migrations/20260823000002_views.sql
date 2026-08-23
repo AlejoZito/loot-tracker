@@ -22,13 +22,13 @@ expanded as (
     e.id                                                                           as expense_id,
     g.j + 1                                                                        as installment_number,
     e.amount / greatest(e.installments, 1)                                         as installment_amount,
-    date_trunc('month', e.occurred_at)::date                                       as origin_month,
+    e.period                                                                       as origin_month,
     -- Always origin + j months, independent of the day-of-month rule below, so no
     -- date mode can shift money between monthly summaries.
-    (date_trunc('month', e.occurred_at)::date + (g.j || ' months')::interval)::date as period_month,
+    (e.period + (g.j || ' months')::interval)::date                                 as period_month,
     g.j                                                                            as months_out,
     cfg.date_mode,
-    e.occurred_at
+    e.occurred_local
   from expenses e
   cross join cfg
   cross join lateral generate_series(0, greatest(e.installments, 1) - 1) as g(j)
@@ -44,10 +44,10 @@ select
     when 'legacy_overflow' then
       -- Overflows a short month: 2024-01-31 + 1 month becomes 2024-03-02, so February
       -- receives no installment and March is charged twice.
-      (x.period_month + (extract(day from x.occurred_at)::int - 1))
+      (x.period_month + (extract(day from x.occurred_local)::int - 1))
     else
       -- 'clamp' (default): Postgres-native, 2024-01-31 + 1 month becomes 2024-02-29.
-      (x.occurred_at + (x.months_out || ' months')::interval)::date
+      (x.occurred_local + (x.months_out || ' months')::interval)::date
   end                                as period_date
 from expanded x;
 
