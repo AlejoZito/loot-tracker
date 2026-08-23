@@ -1,7 +1,7 @@
 import { Date as DomainDate } from './date';
 
 export type TransactionType = 'income' | 'expense';
-export type Currency = 'ARS' | 'USD' | 'EUR';
+export type Currency = 'ARS' | 'USD' | 'EUR' | 'BRL';
 
 export class InstallmentExpense {
   constructor(

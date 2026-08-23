@@ -2,10 +2,20 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { api } from '../services/api';
 import type { AppConfig } from '../types';
 
+// Serves until GET /api/config resolves, and stands if it fails. Keep in sync with
+// DefaultAppSettingsRepository on the server.
 const FALLBACK_CONFIG: AppConfig = {
   users: [
     { slot: 'userA', id: 'user-a', label: 'User A' },
     { slot: 'userB', id: 'user-b', label: 'User B' },
+  ],
+  mainCurrency: 'USD',
+  defaultExpenseCurrency: 'ARS',
+  locale: 'es-AR',
+  currencies: [
+    { code: 'ARS', name: 'Argentine Peso', symbol: '$', decimalPlaces: 2 },
+    { code: 'USD', name: 'US Dollar', symbol: 'US$', decimalPlaces: 2 },
+    { code: 'EUR', name: 'Euro', symbol: '€', decimalPlaces: 2 },
   ],
 };
 
@@ -20,6 +30,8 @@ interface BudgetConfigContextValue {
   slotForUser: (id?: string | null) => 'userA' | 'userB';
   /** Display label for a household slot. */
   labelForSlot: (slot: 'userA' | 'userB') => string;
+  /** Display symbol for a currency code (falls back to the code itself if unknown). */
+  currencySymbol: (code: string) => string;
 }
 
 const BudgetConfigContext = createContext<BudgetConfigContextValue | null>(null);
@@ -41,9 +53,10 @@ export function BudgetConfigProvider({ children }: { children: ReactNode }) {
   const initialForUser = (id: string) => labelForUser(id).charAt(0).toUpperCase() || '?';
   const slotForUser = (id?: string | null) => config.users.find(u => u.id === id)?.slot ?? 'userA';
   const labelForSlot = (slot: 'userA' | 'userB') => config.users.find(u => u.slot === slot)?.label || slot;
+  const currencySymbol = (code: string) => config.currencies.find(c => c.code === code)?.symbol || code;
 
   return (
-    <BudgetConfigContext.Provider value={{ config, loading, labelForUser, initialForUser, slotForUser, labelForSlot }}>
+    <BudgetConfigContext.Provider value={{ config, loading, labelForUser, initialForUser, slotForUser, labelForSlot, currencySymbol }}>
       {children}
     </BudgetConfigContext.Provider>
   );

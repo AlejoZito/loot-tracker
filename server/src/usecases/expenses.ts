@@ -1,4 +1,4 @@
-import { expenseRepository } from '../repositories/sheet/SheetExpenseRepository';
+import { expenseRepository } from '../repositories';
 import type { Expense } from '../domain/expense';
 
 export async function getAllExpenses(): Promise<Expense[]> {

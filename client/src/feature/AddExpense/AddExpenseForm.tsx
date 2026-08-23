@@ -20,7 +20,7 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
   const isEditing = Boolean(id);
   const npc = useDialogNPC();
   const isOnline = useOnlineStatus();
-  const { config } = useBudgetConfig();
+  const { config, currencySymbol } = useBudgetConfig();
   const defaultUserId = config.users[0]?.id ?? '';
 
   const [allCategories, setAllCategories] = useState<Category[]>([]);
@@ -30,7 +30,9 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
   const [offlineQueued, setOfflineQueued] = useState(false);
 
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState<Currency>('ARS');
+  const [currency, setCurrency] = useState<Currency>(config.defaultExpenseCurrency);
+  // Once the user picks a currency we stop syncing it from config below.
+  const currencyTouched = useRef(false);
   const [category, setCategory] = useState<string | null>(null);
   const [isIncome, setIsIncome] = useState(false);
   const [installments, setInstallments] = useState('');
@@ -38,6 +40,13 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
   const [isShared, setIsShared] = useState(true);
   const [user, setUser] = useState(() => localStorage.getItem('budgetUser') || defaultUserId);
   const [expenseDate, setExpenseDate] = useState('');
+
+  // The useState above can only read the fallback config; /api/config resolves later.
+  // Adopting it must not clobber a user's pick or an edited expense's own currency.
+  useEffect(() => {
+    if (isEditing || currencyTouched.current) return;
+    setCurrency(config.defaultExpenseCurrency);
+  }, [config.defaultExpenseCurrency, isEditing]);
 
   const [animationState, setAnimationState] = useState<'idle' | 'collapsing' | 'expanding'>('idle');
   const [displayedType, setDisplayedType] = useState<TransactionType>('expense');
@@ -238,7 +247,7 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
               <div className="amount-input-group flex gap-2">
                 <div className="amount-input-wrapper relative flex-1">
                   <span className="amount-currency-symbol currency-prefix">
-                    {{ ARS: '$', USD: 'US$', EUR: '€' }[currency]}
+                    {currencySymbol(currency)}
                   </span>
                   <input
                     type="number"
@@ -270,15 +279,15 @@ export function AddExpenseForm({ id, onSuccess, onCancel }: AddExpenseFormProps)
 
             <fieldset className="currency-field space-y-1.5">
               <label className="currency-label field-label">Moneda</label>
-              <div className="currency-options grid grid-cols-3 gap-3">
-                {(['ARS', 'USD', 'EUR'] as const).map((curr) => (
+              <div className={cn('currency-options grid gap-3', config.currencies.length > 3 ? 'grid-cols-4' : 'grid-cols-3')}>
+                {config.currencies.map(({ code }) => (
                   <button
-                    key={curr}
+                    key={code}
                     type="button"
-                    onClick={() => setCurrency(curr)}
-                    className={cn('currency-option-btn btn h-11', currency === curr && 'currency-option-btn--selected btn-selected')}
+                    onClick={() => { currencyTouched.current = true; setCurrency(code); }}
+                    className={cn('currency-option-btn btn h-11', currency === code && 'currency-option-btn--selected btn-selected')}
                   >
-                    {curr}
+                    {code}
                   </button>
                 ))}
               </div>

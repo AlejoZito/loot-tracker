@@ -1,9 +1,10 @@
 import type { ISheetProvider } from '../../providers/ISheetProvider';
 import { sheetProvider } from '../../providers/sheetProvider';
 import { rowToInstallmentExpense, SHEET_RANGES } from '../../mappers/sheetMapper';
+import type { IInstallmentRepository } from '../IInstallmentRepository';
 import type { InstallmentExpense } from '../../domain/installmentExpense';
 
-export class SheetInstallmentRepository {
+export class SheetInstallmentRepository implements IInstallmentRepository {
   constructor(private provider: ISheetProvider) {}
 
   async getByCategory(category: string, user?: string): Promise<InstallmentExpense[]> {

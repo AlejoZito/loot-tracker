@@ -94,7 +94,9 @@ function expenseSecondaryText(e: Expense): string {
 
 function fmtAmount(amount: number, type: string, currency: string): string {
   const sign = type === 'income' ? '+' : '-';
-  const symbol = ({ USD: 'U$', EUR: '€', ARS: '$' } as Record<string, string>)[currency] ?? '$';
+  // Module-level, so the config context is unreachable. An unknown currency falls back
+  // to its own code: rendering '$' for one would misstate the amount.
+  const symbol = ({ USD: 'U$', EUR: '€', ARS: '$', BRL: 'R$' } as Record<string, string>)[currency] ?? currency;
   return `${sign}${symbol}${amount.toLocaleString('es-AR')}`;
 }
 

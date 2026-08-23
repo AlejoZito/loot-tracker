@@ -1,4 +1,4 @@
-import { habitRepository } from '../repositories/sheet/SheetHabitRepository';
+import { habitRepository } from '../repositories';
 import { Habit } from '../domain/habit';
 import { Date as DomainDate } from '../domain/date';
 import type { HabitCategory } from '../domain/habit';
