@@ -2,10 +2,20 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { api } from '../services/api';
 import type { AppConfig } from '../types';
 
+// Serves until GET /api/config resolves, and stands if it fails. Keep in sync with
+// DefaultAppSettingsRepository on the server.
 const FALLBACK_CONFIG: AppConfig = {
   users: [
     { slot: 'userA', id: 'user-a', label: 'User A' },
     { slot: 'userB', id: 'user-b', label: 'User B' },
+  ],
+  mainCurrency: 'USD',
+  defaultExpenseCurrency: 'ARS',
+  locale: 'es-AR',
+  availableCurrencies: [
+    { code: 'ARS', name: 'Argentine Peso', symbol: '$', decimalPlaces: 2 },
+    { code: 'USD', name: 'US Dollar', symbol: 'US$', decimalPlaces: 2 },
+    { code: 'EUR', name: 'Euro', symbol: '€', decimalPlaces: 2 },
   ],
 };
 

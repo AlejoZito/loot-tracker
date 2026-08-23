@@ -36,8 +36,13 @@ time to reset back to the sample data.
 - **`common/`** — Shared DTOs (`types.ts`), the single source of truth for both sides
 - **`api/`** — Vercel serverless entry point (imports the same Express app as `server/`)
 
-Data lives behind an `ISheetProvider` interface (`server/src/providers/`) with two
-implementations: a local `.xlsx` file (the default) or a real Google Sheet.
+- **`supabase/`** — SQL migrations for the Postgres datasource
+
+Data lives behind repository interfaces (`server/src/repositories/`), with the datasource
+chosen once in `server/src/repositories/index.ts` from `DATA_SOURCE`: a local `.xlsx` file
+(the default), a real Google Sheet, or Postgres. The two sheet backends share an
+`ISheetProvider` (`server/src/providers/`); Postgres implements the repository interfaces
+directly, because a spreadsheet's cell-range API is a poor fit for SQL.
 
 ## Using your own Google Sheet instead
 
@@ -52,7 +57,23 @@ set `DATA_SOURCE=google-sheets` and follow **[`quickstart/README.md`](quickstart
 to create a Google Cloud service account and spreadsheet, then fill in `.env`
 (`cp .env.example .env` first).
 
-B) Implement a database schema
+B) **use a real database** — set `DATA_SOURCE=db`:
+
+```
+# 1. provision Postgres (Vercel Marketplace) and pull the credentials
+npm i -g vercel && vercel link
+vercel integration add supabase
+vercel env pull
+
+# 2. set your household timezone in supabase/migrations/*_init.sql (it defaults to
+#    America/Argentina/Buenos_Aires) and apply supabase/migrations/*.sql
+```
+
+This is the only mode where **the app computes its own numbers**. `summary`,
+`summary_by_categories` and `expenses_by_installments` are SQL views over `expenses`, so
+they recompute on every read and cannot go stale — no Apps Script, no formula maintenance,
+and editing an old expense immediately corrects every month it touches. It also makes the
+reporting currency configurable (`app_config.main_currency`) rather than hardcoded to USD.
 
 ## Testing
 
@@ -74,9 +95,14 @@ This is built around a **two-person household** — the sheet's `summary` tab is
 two-column-per-metric layout, and auth is fixed to two accounts (`userA`/`userB` slots,
 with configurable ids and display names). It is not a general multi-user system. 
 
-The UI is Spanish-first with ARS/USD/EUR currency support. See `quickstart/README.md`'s "Known
-limitations" section and `docs/plans/2026-08-22-genericize-for-sharing.md` for more detail
-and a sketch of what a database-backed, N-user version would take.
+The UI is Spanish-first. Currency support is ARS/USD/EUR in the sheet modes; `DATA_SOURCE=db`
+adds BRL and makes the offered set configurable via the `currencies` table. See
+`quickstart/README.md`'s "Known limitations" section for more detail.
+
+**The `summary` tab does the math, not the app** — but only in the sheet modes, where
+category totals, splits and savings come from spreadsheet formulas (or, in `xlsx` mode, a
+static snapshot that never recomputes). `DATA_SOURCE=db` removes this limitation entirely:
+that logic lives in `supabase/migrations/` as SQL views.
 
 ## License
 

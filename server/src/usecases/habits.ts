@@ -1,4 +1,4 @@
-import { habitRepository } from '../repositories/sheet/SheetHabitRepository';
+import { habitRepository } from '../repositories';
 import { Habit } from '../domain/habit';
 import { Date as DomainDate } from '../domain/date';
 import type { HabitCategory } from '../domain/habit';
@@ -12,8 +12,8 @@ export async function getHabitsForDay(day: string): Promise<Habit[]> {
   return habitRepository.getByDay(day);
 }
 
-export async function getRecentHabits(days: number): Promise<Habit[]> {
-  return habitRepository.getRecent(days);
+export async function getRecentHabits(days: number, today: string): Promise<Habit[]> {
+  return habitRepository.getRecent(days, today);
 }
 
 export function getHabitMonthSummary(

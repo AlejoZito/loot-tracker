@@ -1,4 +1,4 @@
-import { installmentRepository } from '../repositories/sheet/SheetInstallmentRepository';
+import { installmentRepository } from '../repositories';
 import type { InstallmentExpense } from '../domain/installmentExpense';
 
 export async function getInstallmentsByCategory(category: string, user?: string): Promise<InstallmentExpense[]> {

@@ -3,7 +3,7 @@
 
 export type TransactionType = 'income' | 'expense';
 export type CategoryType = 'income' | 'expense';
-export type Currency = 'ARS' | 'USD' | 'EUR';
+export type Currency = 'ARS' | 'USD' | 'EUR' | 'BRL';
 
 export interface Expense {
   id: string;
@@ -125,8 +125,6 @@ export interface InstallmentExpense {
   type: TransactionType;
   shared: boolean;
   user: string;
-  usdCurrentMonth: number;   // USD at installment month's exchange rate
-  usdOrigin: number;         // USD at original purchase month's exchange rate
 }
 
 export interface LoginRequest {
@@ -139,7 +137,24 @@ export interface LoginResponse {
   budgetUser: string;
 }
 
-/** Public, auth-protected app configuration — display labels for the two budget-user slots. */
+export interface CurrencyOption {
+  code: Currency;
+  name: string;
+  symbol: string;
+  decimalPlaces: number;
+}
+
+/**
+ * Public, auth-protected app configuration.
+ *
+ * `mainCurrency` is what every summary figure is denominated in; `availableCurrencies` is
+ * the set offered when recording an expense. These are separate: the currency you spend in
+ * is not the one you report in.
+ */
 export interface AppConfig {
   users: { slot: 'userA' | 'userB'; id: string; label: string }[];
+  mainCurrency: Currency;
+  defaultExpenseCurrency: Currency;
+  locale: string;
+  availableCurrencies: CurrencyOption[];
 }

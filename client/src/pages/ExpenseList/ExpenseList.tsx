@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import type { Expense } from '../../types';
+import type { Expense, CurrencyOption } from '../../types';
 import { useRightSlot } from '../../context/RightSlotContext';
 import { useBudgetConfig } from '../../context/BudgetConfigContext';
 import { useViewport } from '../../hooks/useViewport';
@@ -92,9 +92,10 @@ function expenseSecondaryText(e: Expense): string {
   return e.notes?.trim() ? `${e.category} · ${date}` : date;
 }
 
-function fmtAmount(amount: number, type: string, currency: string): string {
+function fmtAmount(amount: number, type: string, currency: string, currencies: CurrencyOption[]): string {
   const sign = type === 'income' ? '+' : '-';
-  const symbol = ({ USD: 'U$', EUR: '€', ARS: '$' } as Record<string, string>)[currency] ?? '$';
+  // An unknown currency falls back to its own code: rendering '$' for one would misstate it.
+  const symbol = currencies.find((c) => c.code === currency)?.symbol ?? currency;
   return `${sign}${symbol}${amount.toLocaleString('es-AR')}`;
 }
 
@@ -406,7 +407,7 @@ export default function ExpenseList({ budgetUser }: ExpenseListProps) {
                   </div>
                   <div className="expense-row-aside">
                     <span className={`expense-row-amount expense-row-amount--${expense.type}`}>
-                      {fmtAmount(expense.amount, expense.type, expense.currency)}
+                      {fmtAmount(expense.amount, expense.type, expense.currency, config.availableCurrencies)}
                     </span>
                     <PayerBadge payer={slotForUser(expense.user, config)} shared={expense.shared} />
                   </div>

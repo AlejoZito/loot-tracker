@@ -42,8 +42,12 @@ export type BudgetUserSlot = (typeof budgetUsers)[number]['slot'];
  * the bundled sample database on first run — so a fresh clone can run immediately with
  * no Google Cloud setup. Set DATA_SOURCE=google-sheets to use a real Google Sheet instead
  * (see quickstart/README.md); that's when GOOGLE_SHEETS_ID becomes required.
+ *
+ * DATA_SOURCE=db uses Postgres and requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
+ * It derives the summary, category and installment data with SQL views; the sheet modes
+ * read those tabs as values computed outside the app.
  */
-export const dataSource = (optional('DATA_SOURCE', 'xlsx') as 'xlsx' | 'google-sheets');
+export const dataSource = (optional('DATA_SOURCE', 'xlsx') as 'xlsx' | 'google-sheets' | 'db');
 
 const REPO_ROOT = path.resolve(__dirname, '../../..');
 

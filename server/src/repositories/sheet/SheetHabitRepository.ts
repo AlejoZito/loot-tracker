@@ -60,19 +60,15 @@ export class SheetHabitRepository implements IHabitRepository {
     return habitRowToHabits(row, categories);
   }
 
-  async getRecent(days: number): Promise<Habit[]> {
+  async getRecent(days: number, today: string): Promise<Habit[]> {
     const categories = await this.getCategories();
     const rows = await this.provider.getRows('habits', SHEET_RANGES.habits);
     if (rows.length <= 1) return [];
 
+    const last = DomainDate.fromISO(today);
     const validDays = new Set<string>();
-    const today = new globalThis.Date();
     for (let i = 0; i < days; i++) {
-      const d = new globalThis.Date(today);
-      d.setDate(d.getDate() - i);
-      const dd = String(d.getDate()).padStart(2, '0');
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      validDays.add(`${d.getFullYear()}-${mm}-${dd}`);
+      validDays.add(last.minusDays(i).toISO());
     }
 
     const allHabits: Habit[] = [];

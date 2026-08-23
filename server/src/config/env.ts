@@ -39,6 +39,14 @@ export const config = {
     ],
     jwtSecret: required('JWT_SECRET'),
   },
+  supabase: {
+    // Validated at boot so a misconfigured deploy fails with a clear message rather
+    // than on the first request that touches the database.
+    url: dataSource === 'db' ? required('SUPABASE_URL') : optional('SUPABASE_URL', ''),
+    serviceRoleKey: dataSource === 'db'
+      ? required('SUPABASE_SERVICE_ROLE_KEY')
+      : optional('SUPABASE_SERVICE_ROLE_KEY', ''),
+  },
   googleSheets: {
     // Only required when DATA_SOURCE=google-sheets — the default DATA_SOURCE=xlsx doesn't
     // touch Google Sheets at all, so it shouldn't force you to have a spreadsheet ready.

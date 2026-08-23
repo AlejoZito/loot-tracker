@@ -18,4 +18,5 @@ export type {
   CategoryHistoryRow,
   InstallmentExpense,
   AppConfig,
+  CurrencyOption,
 } from '../../../common/types';

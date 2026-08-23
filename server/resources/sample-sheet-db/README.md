@@ -13,7 +13,7 @@ file itself is never modified by the running app.
 All 8 tabs the app expects (see the column-by-column layout in `quickstart/README.md`),
 including a few months of realistic-looking `expenses` and `habits` data, plus the
 formula-driven `summary` / `summary_by_categories` / `expenses_by_installments` tabs
-computed the way a real Google Sheet would (see `docs/sheets-apps-script/cuotificar.gs` for
+computed the way a real Google Sheet would (see `cuotificar.gs` in this directory for
 how `expenses_by_installments` is generated from `expenses` + `exchange`).
 
 Those three derived tabs are a **static snapshot** — nothing in `xlsx` mode recomputes them

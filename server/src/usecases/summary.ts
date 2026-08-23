@@ -1,4 +1,4 @@
-import { summaryRepository } from '../repositories/sheet/SheetSummaryRepository';
+import { summaryRepository } from '../repositories';
 import type { MonthlySummary } from '../domain/monthlySummary';
 import type { CategoryTransaction } from '../domain/categoryTransaction';
 import type { Period } from '../domain/period';

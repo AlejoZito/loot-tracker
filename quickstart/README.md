@@ -1,6 +1,6 @@
 # Quickstart
 
-Nothing personal ships in this repo. There are two ways to run it:
+Nothing personal ships in this repo. There are three ways to run it:
 
 - **Local `.xlsx` file** (`DATA_SOURCE=xlsx`, the default) — zero Google Cloud setup, just
   `.env` with login credentials. Seeded with sample data at
@@ -9,6 +9,11 @@ Nothing personal ships in this repo. There are two ways to run it:
   `summary`/`expenses_by_installments` tabs actually recompute live as you edit data
   (Google Sheets does that on its own; a static local file can't). Needs a one-time Google
   Cloud service account setup, covered below.
+- **Postgres** (`DATA_SOURCE=db`) — the app computes its own summaries instead of reading
+  someone else's: the derived tabs are SQL views (`supabase/migrations/`), so nothing goes
+  stale and there is no Apps Script or formula maintenance. This whole page is about the
+  sheet backends; for the database path see the README's "Using your own Google Sheet
+  instead" section, option B.
 
 Either way, start with:
 
@@ -146,7 +151,7 @@ names required, just: column A = month key (`YYYY-MM`), column B = USD rate, col
 rate. One row per month you want a rate for.
 
 #### Generating `expenses_by_installments` with Apps Script
-[`docs/sheets-apps-script/cuotificar.gs`](../docs/sheets-apps-script/cuotificar.gs) is a
+[`cuotificar.gs`](../server/resources/sample-sheet-db/cuotificar.gs) is a
 ready-to-use script that reads `expenses` + `exchange` and (re)writes the entire
 `expenses_by_installments` tab. To use it:
 1. In your spreadsheet: **Extensions → Apps Script**.
@@ -196,15 +201,21 @@ deletes test rows in it. Never point this at your real data.
 
 - **Two-person household only.** The `summary` sheet tab is a fixed two-column layout per
   metric, and the app's auth is fixed to two accounts. Supporting more people means
-  redesigning that tab and the summary domain model — see
-  `docs/plans/2026-08-22-genericize-for-sharing.md` for the reasoning and what's currently
-  hardcoded around this.
+  redesigning that tab and the summary domain model. This applies to `DATA_SOURCE=db` too:
+  the schema would accept more users, but `MonthlySummary` and the summary view still pivot
+  into exactly two slots.
 - **Spanish-first UI.** Most on-screen text, category values (`Ingreso`/`Egreso`,
   `Si`/`No`), and the advisor character's dialogue are in Spanish. Currency support is
   ARS/USD/EUR.
-- **The `summary` tab does the math, not the app.** Category totals, splits, and savings
-  are computed by formulas (on a real Google Sheet) or a static snapshot (in `xlsx` mode);
-  the app only reads results, never computes them itself. If you're setting up your own
-  Google Sheet from scratch, this is the single most fragile part — get the `expenses` tab
-  flowing first, then build the summary formulas incrementally and check the "Resumen" page
-  as you go.
+- **The `summary` tab does the math, not the app** — in the sheet modes. Category totals,
+  splits, and savings are computed by formulas (on a real Google Sheet) or a static
+  snapshot (in `xlsx` mode); the app only reads results, never computes them itself. If
+  you're setting up your own Google Sheet from scratch, this is the single most fragile
+  part — get the `expenses` tab flowing first, then build the summary formulas
+  incrementally and check the "Resumen" page as you go.
+
+  **`DATA_SOURCE=db` does not have this limitation.** There, `summary`,
+  `summary_by_categories` and `expenses_by_installments` are SQL views over `expenses`
+  (`supabase/migrations/`), recomputed on every read. Nothing to maintain, nothing to
+  regenerate, and no snapshot to drift. See the README's "Using your own Google Sheet
+  instead" section, option B.

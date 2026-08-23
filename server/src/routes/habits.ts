@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { getHabitsForDay, getRecentHabits, computeHabitMonthSummary, upsertHabit, initHabitDay, getHabitHistory } from '../usecases/habits';
 import { habitToDto } from '../mappers/dtoMapper';
+import { Date as DomainDate } from '../domain/date';
 
 const router = Router();
 
@@ -13,7 +14,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     const days = req.query.days ? parseInt(req.query.days as string) : undefined;
 
     if (days) {
-      const habits = await getRecentHabits(days);
+      const habits = await getRecentHabits(days, DomainDate.today().toISO());
       return res.json(habits.map(habitToDto));
     }
 

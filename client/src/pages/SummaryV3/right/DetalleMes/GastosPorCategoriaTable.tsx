@@ -148,8 +148,6 @@ export function GastosPorCategoriaTable({ expenses, installments, user }: Props)
               const catInstallments = filterInstallments(rawInstallments, user);
               const hasDetail = catInstallments.length > 0;
 
-              const subTotal = catInstallments.reduce((s, i) => s + i.usdCurrentMonth, 0);
-
               return (
                 <Fragment key={cat.category}>
                   <div
@@ -206,7 +204,7 @@ export function GastosPorCategoriaTable({ expenses, installments, user }: Props)
                       })}
                       <div className="detalle-tx__footer">
                         <span>{catInstallments.length} cuota{catInstallments.length !== 1 ? 's' : ''}</span>
-                        <span className="detalle-tx__footer-total">${subTotal.toFixed(2)}</span>
+                        <span className="detalle-tx__footer-total">${cat.total.toFixed(2)}</span>
                       </div>
                     </div>
                   )}
