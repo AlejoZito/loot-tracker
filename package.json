@@ -1,0 +1,23 @@
+{
+  "name": "loot-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:client && npm run build:server",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "cross-env RUN_E2E=true vitest run tests/server/e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
+    "vitest": "^4.0.18",
+    "xlsx": "^0.18.5"
+  }
+}

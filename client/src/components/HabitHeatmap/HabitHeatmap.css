@@ -1,0 +1,40 @@
+/* Library hard-codes SQUARE_SIZE = 10. We render the SVG inside a
+   wrapper that can scale it via CSS transform. */
+.habit-heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.habit-heatmap-scaled {
+  display: inline-block;
+  transform-origin: top left;
+}
+
+/* Override library text to use theme color */
+.react-calendar-heatmap text {
+  fill: var(--muted-fg) !important;
+  font-family: inherit;
+}
+
+/* Legend */
+.habit-heatmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.habit-heatmap-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--fg);
+}
+
+.habit-heatmap-legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}

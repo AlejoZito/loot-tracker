@@ -1,0 +1,706 @@
+/* ===========================
+   Material Design Theme
+   =========================== */
+
+[data-theme="material"] .page-bg {
+  background: var(--bg);
+}
+
+/* Panel - clean card style, no frame images */
+[data-theme="material"] .panel-frame-top,
+[data-theme="material"] .panel-frame-bottom {
+  display: none;
+}
+
+[data-theme="material"] .panel-frame-center {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  margin: 0.5rem;
+}
+
+/* Page title */
+[data-theme="material"] .page-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--fg);
+  text-align: center;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+[data-theme="material"] .btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  background: var(--primary);
+  color: var(--primary-fg);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.02em;
+}
+
+[data-theme="material"] .btn:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+  filter: brightness(1.05);
+}
+
+[data-theme="material"] .btn:active {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transform: translateY(0);
+}
+
+[data-theme="material"] .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+[data-theme="material"] .btn-selected {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+[data-theme="material"] .btn-success {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+[data-theme="material"] .btn-danger {
+  background: var(--destructive);
+  color: var(--destructive-fg);
+}
+
+/* Input fields */
+[data-theme="material"] .input-field {
+  font-size: 0.875rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: white;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-theme="material"] .input-field::placeholder {
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px oklch(0.49 0.16 275 / 0.15);
+}
+
+[data-theme="material"] .input-field-lg {
+  font-size: 1.125rem;
+  padding-left: 3rem;
+}
+
+[data-theme="material"] .textarea-field {
+  min-height: 60px;
+  resize: none;
+}
+
+/* Field label */
+[data-theme="material"] .field-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Toggle */
+[data-theme="material"] .toggle-container {
+  background: var(--muted);
+  border: none;
+  border-radius: 8px;
+}
+
+[data-theme="material"] .toggle-btn {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--muted-fg);
+  border: none;
+  border-radius: 6px;
+}
+
+[data-theme="material"] .toggle-btn-active {
+  background: white;
+  color: var(--fg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="material"] .toggle-btn-income {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+[data-theme="material"] .toggle-btn-expense {
+  background: var(--destructive);
+  color: var(--destructive-fg);
+}
+
+[data-theme="material"] .toggle-btn-shared-own {
+  background: white;
+  color: var(--fg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="material"] .toggle-btn-shared {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+/* Category */
+[data-theme="material"] .category-icon {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--muted);
+}
+
+[data-theme="material"] .category-btn-selected .category-icon {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px oklch(0.49 0.16 275 / 0.2);
+}
+
+[data-theme="material"] .category-label {
+  font-size: 0.625rem;
+  color: var(--fg);
+}
+
+[data-theme="material"] .category-btn-selected .category-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Category grid animations - simple fade */
+[data-theme="material"] .category-grid--collapsing .category-option {
+  animation: mat-fade-out 0.2s ease-in forwards;
+}
+
+[data-theme="material"] .category-grid--expanding .category-option {
+  animation: mat-fade-in 0.2s ease-out forwards;
+}
+
+@keyframes mat-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes mat-fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Switch toggle */
+[data-theme="material"] .switch-toggle {
+  background: var(--border);
+  border: none;
+  border-radius: 0.75rem;
+}
+
+[data-theme="material"] .switch-toggle-on {
+  background: var(--accent);
+}
+
+[data-theme="material"] .switch-thumb {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Helper text */
+[data-theme="material"] .helper-text {
+  font-size: 0.6875rem;
+  color: var(--muted-fg);
+}
+
+/* Currency prefix */
+[data-theme="material"] .currency-prefix {
+  font-size: 1rem;
+  color: var(--muted-fg);
+}
+
+/* Submit button */
+[data-theme="material"] .submit-btn {
+  height: 3rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ===========================
+   Cuenta Page - Material
+   =========================== */
+
+[data-theme="material"] .cuenta-portrait-frame {
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+[data-theme="material"] .cuenta-portrait {
+  border-radius: 50%;
+}
+
+[data-theme="material"] .cuenta-logout-btn:hover .cuenta-logout-icon-frame {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="material"] .cuenta-logout-icon-frame {
+  border: none;
+  border-radius: 16px;
+  background: var(--destructive);
+}
+
+[data-theme="material"] .cuenta-logout-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-fg);
+}
+
+/* ===========================
+   Expense List - Material
+   =========================== */
+
+[data-theme="material"] .expense-list-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--fg);
+  text-align: center;
+}
+
+/* Card visual styles live in components/Card/base.css */
+[data-theme="material"] .card{
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* FAB - Material */
+[data-theme="material"] .expense-list-fab {
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 16px;
+  background: var(--primary);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2), 0 6px 10px rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="material"] .expense-list-fab:hover {
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2), 0 8px 14px rgba(0, 0, 0, 0.14);
+  transform: translateY(-2px);
+}
+
+[data-theme="material"] .expense-list-fab:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+}
+
+[data-theme="material"] .expense-list-fab-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Chart containers - Material */
+[data-theme="material"] .summary-chart-container {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Offline banner - Material */
+[data-theme="material"] .offline-banner {
+  background: var(--muted);
+  color: var(--muted-fg);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Theme switcher - Material */
+[data-theme="material"] .theme-switcher {
+  margin-top: 1rem;
+}
+
+[data-theme="material"] .theme-switcher-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-fg);
+  margin-bottom: 0.5rem;
+}
+
+/* ===========================
+   Habits Page - Material
+   =========================== */
+
+[data-theme="material"] .habits-day-label {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+[data-theme="material"] .habits-section-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="material"] .habits-progress-label {
+  font-size: 0.875rem;
+  color: var(--fg);
+}
+
+[data-theme="material"] .habits-progress-bar {
+  background: var(--muted);
+}
+
+[data-theme="material"] .habits-progress-fill {
+  background: var(--primary);
+}
+
+[data-theme="material"] .habits-toggle-row {
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="material"] .habits-toggle-row:last-child {
+  border-bottom: none;
+}
+
+[data-theme="material"] .habits-toggle-label {
+  font-size: 0.9375rem;
+  color: var(--fg);
+}
+
+[data-theme="material"] .habits-loading {
+  font-size: 0.875rem;
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .habits-skeleton {
+  background: var(--muted);
+}
+
+/* ===========================
+   Expense List — Hi-Fi
+   =========================== */
+
+[data-theme="material"] .expense-header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-theme="material"] .expense-filter-tab {
+  background: var(--muted);
+  border: none;
+  color: var(--muted-fg);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 18px;
+}
+
+[data-theme="material"] .expense-filter-tab--active {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+[data-theme="material"] .expense-day-banner__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-fg);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="material"] .expense-day-banner__total {
+  font-size: 12px;
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .expense-list-body {
+  padding: 0 12px;
+}
+
+[data-theme="material"] .expense-row {
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+[data-theme="material"] .expense-row-content {
+  background: var(--muted);
+}
+
+[data-theme="material"] .expense-row-actions {
+  background: transparent;
+}
+
+[data-theme="material"] .expense-row-actions__edit {
+  background: var(--primary);
+  color: var(--primary-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+[data-theme="material"] .expense-row-actions__delete {
+  background: var(--destructive);
+  color: var(--destructive-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+[data-theme="material"] .expense-row-actions__approve {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+[data-theme="material"] .expense-row-actions__reject {
+  background: var(--destructive);
+  color: var(--destructive-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+[data-theme="material"] .expense-row--draft .expense-row-content {
+  border-left: 3px solid var(--accent);
+  background-color: var(--muted-bg);
+}
+
+[data-theme="material"] .expense-row-primary {
+  font-size: 14px;
+  color: var(--fg);
+}
+
+[data-theme="material"] .expense-row-secondary {
+  font-size: 12px;
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .expense-row-amount {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+[data-theme="material"] .expense-row-amount--income {
+  color: var(--accent);
+}
+
+[data-theme="material"] .expense-row-amount--expense {
+  color: var(--destructive);
+}
+
+[data-theme="material"] .expense-payer-badge {
+  background: transparent;
+}
+
+[data-theme="material"] .expense-cat-tile {
+  background: transparent;
+}
+
+[data-theme="material"] .expense-cat-tile--draft {
+  background: var(--muted);
+  border-radius: 8px;
+}
+
+[data-theme="material"] .expense-list-empty__main {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="material"] .expense-list-empty__sub {
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+
+/* ===========================
+   Expense Search - Material
+   =========================== */
+
+[data-theme="material"] .expense-search--open {
+  background: var(--muted);
+  border-radius: 18px;
+}
+
+[data-theme="material"] .expense-search-toggle,
+[data-theme="material"] .expense-search-close {
+  color: var(--muted-fg);
+  font-size: 14px;
+}
+
+[data-theme="material"] .expense-search-input {
+  font-size: 14px;
+  color: var(--fg);
+}
+
+[data-theme="material"] .expense-search-input::placeholder {
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .expense-search-scope__btn {
+  background: var(--muted);
+  color: var(--muted-fg);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 14px;
+  padding: 6px 12px;
+}
+
+[data-theme="material"] .expense-search-scope__btn--active {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+[data-theme="material"] .expense-search-truncated {
+  font-size: 12px;
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .expense-search-cat {
+  background: var(--muted);
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .expense-search-cat--active {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+/* ===========================
+   Summary Widget - Material
+   =========================== */
+
+[data-theme="material"] .summary-widget {
+  background: white;
+  border-left: 1px solid var(--border);
+}
+
+[data-theme="material"] .summary-widget-label {
+  font-size: 0.8rem;
+  color: var(--muted-fg);
+}
+
+[data-theme="material"] .summary-widget-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+[data-theme="material"] .right-slot-drawer-header {
+  background: white;
+  border-bottom-color: var(--border);
+}
+
+[data-theme="material"] .right-slot-drawer-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+/* Mobile nav override */
+@media (max-width: 1099px) {
+  [data-theme="material"] .app-nav {
+    background: white;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  [data-theme="material"] .app-nav-item {
+    color: var(--muted-fg);
+  }
+
+  [data-theme="material"] .app-nav-item--active {
+    color: var(--primary);
+  }
+}
+
+/* ===========================
+   Desktop Sidebar - Material
+   =========================== */
+
+@media (min-width: 1100px) {
+  [data-theme="material"] .app-nav {
+    background: white;
+    border-right: 1px solid var(--border);
+    box-shadow: 1px 0 4px rgba(0, 0, 0, 0.06);
+  }
+
+  [data-theme="material"] .app-nav-brand-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.02em;
+  }
+
+  [data-theme="material"] .app-nav-item {
+    color: var(--muted-fg);
+  }
+
+  [data-theme="material"] .app-nav-item:hover {
+    background: var(--muted);
+    color: var(--fg);
+  }
+
+  [data-theme="material"] .app-nav-item--active {
+    background: var(--muted-bg, #e7effd);
+    color: var(--primary);
+  }
+
+  [data-theme="material"] .app-nav-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: inherit;
+  }
+
+  [data-theme="material"] .app-nav-user {
+    border-top-color: var(--border);
+  }
+
+  [data-theme="material"] .app-nav-user-name {
+    font-size: 0.8rem;
+    color: var(--muted-fg);
+  }
+
+  /* Advisor page — sidebar edge */
+  html.advisor-page-active [data-theme="material"] .app-nav {
+    box-shadow: inset -4px 0 16px rgba(0, 0, 0, 0.4);
+    border-right-color: rgba(0, 0, 0, 0.3);
+  }
+
+  /* Sticky filter header */
+  [data-theme="material"] .expense-list-header-bar {
+    background: white;
+    border-bottom-color: var(--border);
+  }
+
+  /* Aside fallback bg */
+  [data-theme="material"] .app-aside {
+    background: white;
+    border-left: 1px solid var(--border);
+  }
+}

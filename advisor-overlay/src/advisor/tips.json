@@ -1,0 +1,24 @@
+{
+  "tips": [
+    {
+      "text": "Welcome! I am your financial advisor. <think> Let's keep track of your money together.",
+      "users": "all"
+    },
+    {
+      "text": "Did you record all your expenses today? The 90% of people don't know where their money goes. You do. That's worth a lot.",
+      "users": "all"
+    },
+    {
+      "text": "Small daily expenses add up fast. A coffee here, a snack there... <surprised> It can be hundreds per month!",
+      "users": "all"
+    },
+    {
+      "text": "Great job staying on budget this month! <wink> Keep it up and you'll have a solid emergency fund before you know it.",
+      "users": "all"
+    },
+    {
+      "text": "Remember: paying yourself first is the oldest trick in the book. Set aside savings before spending on anything else.",
+      "users": "all"
+    }
+  ]
+}

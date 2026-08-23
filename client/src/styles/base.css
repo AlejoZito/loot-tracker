@@ -1,0 +1,1769 @@
+/* ===========================
+   Base / Shared Layout Styles
+   =========================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ===========================
+   App Shell (grid layout)
+   =========================== */
+
+.app-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "banner"
+    "main";
+  min-height: 100vh;
+}
+
+@media (min-width: 760px) and (max-width: 1099px) {
+  /* Tablet: same as mobile grid, sidebar collapses to bottom */
+}
+
+@media (min-width: 1100px) {
+  .app-shell {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 240px 1fr;
+    grid-template-areas:
+      "banner banner"
+      "sidebar main";
+  }
+
+  .app-shell--with-aside {
+    grid-template-columns: 240px 1fr 420px;
+    grid-template-areas:
+      "banner banner banner"
+      "sidebar main aside";
+  }
+}
+
+.app-banner {
+  grid-area: banner;
+}
+
+.app-main {
+  grid-area: main;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.app-aside {
+  grid-area: aside;
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .app-shell {
+    height: 100vh;
+    min-height: unset;
+  }
+
+  .app-main {
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-main > .page-bg {
+    flex: 1 0 auto;
+    min-height: 0;
+  }
+
+  .app-aside {
+    display: block;
+    position: sticky;
+    top: 0;
+    min-height: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+/* ===========================
+   SummaryV3 responsive layout
+   =========================== */
+
+.summary-v3-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-v3-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-v3-panel {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-v3-panel--active {
+  display: flex;
+}
+
+@media (min-width: 1100px) {
+  .summary-v3-tabs {
+    display: none;
+  }
+
+  .summary-v3-layout {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .summary-v3-panel {
+    display: flex;
+  }
+}
+
+/* ===========================
+   SummaryV3 top bar — filter pills / mobile bottom-sheet chips
+   =========================== */
+
+.summary-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-topbar__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.summary-topbar__pills {
+  display: none;
+}
+
+.summary-topbar__compact {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.summary-chip {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--muted-fg);
+  background: none;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.summary-chip--active {
+  background: var(--primary, #4f81bd);
+  color: #fff;
+  border-color: transparent;
+}
+
+.summary-chip--compact {
+  min-height: 34px;
+  padding: 0.3rem 0.7rem;
+}
+
+@media (min-width: 700px) {
+  .summary-topbar__pills {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .summary-topbar__group {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .summary-topbar__compact {
+    display: none;
+  }
+}
+
+/* ===========================
+   Navigation (bottom on mobile, sidebar on desktop)
+   =========================== */
+
+/* Page background */
+.page-bg {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ── Mobile / Tablet nav: fixed bottom bar ── */
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: #000;
+  padding: 4px 0;
+  overflow: hidden;
+  box-shadow:
+    0px -4px 24px 10px rgba(0, 0, 0, 0.4),
+    -3px -7px 13px -6px rgba(0, 0, 0, 0.5);
+}
+
+.app-nav-items {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.app-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  text-decoration: none;
+  flex: 1;
+}
+
+.app-nav-brand,
+.app-nav-user {
+  display: none;
+}
+
+.app-nav-label {
+  display: none;
+}
+
+/* ── Desktop nav: left sidebar ── */
+@media (min-width: 1100px) {
+  .app-nav {
+    grid-area: sidebar;
+    position: sticky;
+    top: 0;
+    min-height: 0;
+    max-height: 100vh;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .app-nav-brand {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    flex-shrink: 0;
+  }
+
+  .app-nav-brand-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .app-nav-items {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex: 1;
+    gap: 2px;
+    padding: 0.5rem 0.5rem;
+  }
+
+  .app-nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    flex: none;
+  }
+
+  .app-nav-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .app-nav-user {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .app-nav-user-name {
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    opacity: 0.7;
+  }
+}
+
+/* Content panel */
+.content-panel {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 32rem;
+  padding: 1rem;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .content-panel {
+    max-width: 40rem;
+  }
+}
+
+.panel-frame-top,
+.panel-frame-bottom {
+  width: 100%;
+}
+
+.panel-frame-center {
+  flex: 1;
+}
+
+.panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Transaction top row */
+.transaction-top-row {
+  justify-content: center;
+}
+
+/* Toggle container */
+.toggle-container {
+  display: inline-flex;
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+
+/* Card padding/width is now provided by the <Card> component (.card class).
+   See client/src/components/Card/base.css */
+
+/* Fixed submit button */
+.transaction-form-submit-wrapper {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 0.75rem 1rem;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .transaction-form-submit-wrapper {
+    max-width: 40rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .transaction-form-submit-wrapper {
+    position: sticky;
+    bottom: 16px;
+    left: auto;
+    right: auto;
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+
+  .transaction-form {
+    padding-bottom: 1rem;
+  }
+}
+
+/* Add padding at bottom of form so content isn't hidden behind fixed button */
+.transaction-form {
+  padding-bottom: 5rem;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+/* Category button */
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.category-btn:hover {
+  filter: brightness(1.2);
+}
+
+.category-icon {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center;
+}
+
+.category-label {
+  font-size: 8px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  padding-top: 0.25rem;
+}
+
+/* Category grid */
+.category-grid {
+  position: relative;
+  overflow: hidden;
+}
+
+.category-grid .category-option {
+  position: relative;
+}
+
+/* Switch toggle */
+.switch-toggle {
+  position: relative;
+  width: 3rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  width: 1rem;
+  height: calc(100% - 4px);
+  transition: left 0.2s;
+}
+
+.switch-thumb-off {
+  left: 2px;
+}
+
+.switch-thumb-on {
+  left: calc(100% - 1.25rem);
+}
+
+/* Currency prefix */
+.currency-prefix {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Cuenta page */
+.cuenta-page {
+  min-height: 100%;
+  padding-bottom: 5rem;
+}
+
+.cuenta-container {
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.cuenta-portrait-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 280px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.cuenta-portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.cuenta-username {
+  margin-top: 1rem;
+  text-transform: capitalize;
+}
+
+.cuenta-logout-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cuenta-logout-icon-frame {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  transition: all 0.1s;
+}
+
+.cuenta-logout-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 1024px) {
+  .cuenta-portrait-frame {
+    max-width: 360px;
+  }
+}
+
+/* Expense list page */
+.expense-list-page {
+  min-height: 100vh;
+  padding-bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header bar + body share a centered column */
+.expense-list-header-bar,
+.expense-list-body {
+  width: 100%;
+  max-width: 32rem;
+}
+
+@media (min-width: 1024px) {
+  .expense-list-header-bar,
+  .expense-list-body {
+    max-width: 40rem;
+  }
+}
+
+/* Desktop: expand list to fill column, compact filter tabs */
+@media (min-width: 1100px) {
+  .expense-list-page {
+    padding-bottom: 2rem;
+  }
+
+  .expense-list-header-bar,
+  .expense-list-body {
+    max-width: 100%;
+  }
+
+  .expense-list-header-bar {
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .expense-filter-tabs {
+    flex: none;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .expense-filter-tab {
+    flex: none;
+    min-width: 100px;
+    padding: 6px 20px;
+  }
+
+  .expense-filter-row {
+    gap: 12px;
+  }
+
+  /* Push search to the right */
+  .expense-filter-row .expense-search {
+    margin-left: auto;
+  }
+
+  /* Sticky group banners (sticky within body scroll) */
+  .expense-day-banner {
+    position: sticky;
+    top: 60px; /* below the sticky header bar */
+    z-index: 5;
+  }
+
+  /* Hide FAB — add expense is in the right panel.
+     !important needed: theme rules ([data-theme] .expense-list-fab) have higher specificity */
+  .expense-list-fab {
+    display: none !important;
+  }
+}
+
+.expense-list-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.expense-list-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Group banner */
+.expense-day-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+}
+
+/* Filter tabs row (filter tabs + search) */
+.expense-filter-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+
+.expense-filter-tabs {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-filter-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.expense-filter-tab img {
+  width: 12px;
+  height: 30px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.expense-filter-tab__img--inactive {
+  filter: grayscale(1) opacity(0.5);
+}
+
+/* Search bar (icon toggle + input + close) */
+.expense-search {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.expense-search--open {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.expense-search-toggle,
+.expense-search-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
+
+.expense-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  outline: none;
+  animation: expense-search-slide-in 180ms ease both;
+}
+
+@keyframes expense-search-slide-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expense-search-input {
+    animation: none;
+  }
+}
+
+.expense-search-scope {
+  display: flex;
+  gap: 6px;
+}
+
+.expense-search-scope__btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.expense-search-truncated {
+  text-align: center;
+  padding: 6px 12px;
+}
+
+.expense-search-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.expense-search-cat {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.expense-search-cat__emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Rows */
+.expense-row {
+  position: relative;
+  min-height: 72px;
+  overflow: hidden;
+  contain: paint;
+  margin-bottom: 4px;
+}
+
+.expense-row-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 28px;
+  transition: transform 0.3s ease-out;
+  cursor: pointer;
+}
+
+.expense-row--swiped .expense-row-content {
+  transform: translateX(-160px);
+}
+
+.expense-row-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;     /* Vertical */
+  width: 160px;
+}
+
+.expense-row-actions__edit,
+.expense-row-actions__delete {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  /* Add these */
+  display: flex;
+  justify-content: center; /* Horizontal center */
+  align-items: center;     /* Vertical center */
+}
+
+/* Draft row action buttons */
+.expense-row-actions__approve,
+.expense-row-actions__reject {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+
+/* Draft tile (no category yet) */
+.expense-cat-tile--draft {
+  font-size: 16px;
+}
+
+/* Row text block */
+.expense-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.expense-row-primary,
+.expense-row-secondary {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Category tile */
+.expense-cat-tile {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Aside: amount on top, payer badge below */
+.expense-row-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Payer badge */
+.expense-payer-badge {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.expense-payer-badge__img {
+  width: 12px;
+  height: 30px;
+  image-rendering: pixelated;
+}
+
+.expense-payer-badge__secondary {
+  filter: grayscale(1) opacity(0.5);
+}
+
+/* Amount */
+.expense-row-amount {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty state */
+.expense-list-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+/* Skeleton rows */
+.expense-row--skeleton .expense-row-content--skeleton {
+  background: var(--muted);
+  opacity: 0.4;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+
+/* Desktop header add shortcut */
+.expense-header-add-btn {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .expense-header-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+}
+
+/* FAB */
+.expense-list-fab {
+  position: fixed;
+  bottom: 50px;
+  right: 1rem;
+  cursor: pointer;
+  transition: all 0.1s;
+  z-index: 10;
+}
+
+/* Infinite scroll */
+.expense-list-scroll-trigger {
+  height: 1px;
+  width: 100%;
+}
+
+.expense-list-end {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expense-row-content {
+    transition: none;
+  }
+}
+
+/* Desktop: sidebar must paint above main so sliding rows go underneath it */
+@media (min-width: 1100px) {
+  .app-nav {
+    z-index: 20;
+  }
+}
+
+/* ===========================
+   Right Slot Panel
+   =========================== */
+
+.right-slot-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Summary widget */
+.summary-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  height: 100%;
+}
+
+.summary-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-widget-month {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.summary-widget-loading {
+  padding: 1rem 0;
+  opacity: 0.5;
+  font-size: 0.75rem;
+}
+
+.summary-widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-widget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-widget-row--total {
+  border-bottom: none;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 2px solid var(--border);
+}
+
+.summary-widget-label {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.summary-widget-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.summary-widget-value--income {
+  color: var(--accent);
+}
+
+.summary-widget-value--expense {
+  color: var(--destructive);
+}
+
+.summary-widget-add-btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+.summary-widget-topcats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.summary-widget-topcats-title {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.15rem;
+}
+
+.summary-widget-topcat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.summary-widget-topcat-name {
+  font-size: 0.75rem;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  padding-right: 0.5rem;
+}
+
+.summary-widget-topcat-value {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.summary-widget-link {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  text-align: center;
+  text-decoration: none;
+  padding: 0.25rem 0;
+  display: block;
+}
+
+.summary-widget-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Drawer */
+.right-slot-drawer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.right-slot-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.right-slot-drawer-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.right-slot-drawer-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.right-slot-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* In the drawer, the form's submit wrapper should not be fixed — it's inside the aside */
+.right-slot-drawer-body .transaction-form-submit-wrapper {
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  padding: 0.75rem 1rem;
+}
+
+.right-slot-drawer-body .transaction-form-page {
+  min-height: unset;
+}
+
+/* ===========================
+   Offline Banner
+   =========================== */
+
+.offline-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ===========================
+   Habits Page
+   =========================== */
+
+.habits-page {
+  min-height: 100vh;
+  padding-bottom: 5rem;
+}
+
+.habits-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.habits-day-nav {
+  min-width: 2.5rem;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.habits-day-label {
+  flex: 1;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.habits-section-title {
+  margin-bottom: 0.75rem;
+}
+
+.habits-progress-section {
+  margin-bottom: 1.5rem;
+}
+
+.habits-progress-item {
+  margin-bottom: 0.75rem;
+}
+
+.habits-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.habits-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.habits-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.habits-daily-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.habits-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.habits-toggle-label {
+  flex: 1;
+}
+
+.habits-loading {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* Skeleton loading */
+.habits-skeleton {
+  display: block;
+  border-radius: 4px;
+  animation: habits-pulse 1.5s ease-in-out infinite;
+}
+
+.habits-skeleton-text {
+  width: 40%;
+  height: 1rem;
+}
+
+.habits-skeleton-pct {
+  width: 2rem;
+  height: 1rem;
+}
+
+.habits-skeleton-bar {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+
+@keyframes habits-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* ===========================
+   Desktop content-panel width caps per page
+   =========================== */
+
+@media (min-width: 1100px) {
+  .habits-page .content-panel {
+    max-width: 960px;
+  }
+
+  .transaction-form-page .content-panel {
+    max-width: 800px;
+  }
+
+  .cuenta-page .content-panel {
+    max-width: 880px;
+  }
+}
+
+/* ===========================
+   Phase 5 — Desktop page layouts
+   =========================== */
+
+@media (min-width: 1100px) {
+  /* Habits 2-column: stretch both cards to equal height */
+  .habits-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  .habits-cards-grid .habits-progress-section { order: 2; }
+  .habits-cards-grid .habits-daily-section { order: 1; }
+
+  /* Cuenta 2-column */
+  .cuenta-desktop-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+    align-items: start;
+    width: 100%;
+  }
+
+  .cuenta-portrait-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cuenta-portrait-col .cuenta-portrait-frame {
+    max-width: 180px;
+  }
+
+  .cuenta-settings-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+/* ===========================
+   Confirm Modal
+   =========================== */
+
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.confirm-modal {
+  width: 85%;
+  max-width: 320px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.confirm-modal-message {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--fg);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.confirm-modal-cancel,
+.confirm-modal-confirm {
+  flex: 1;
+  padding: 0.6rem 1rem;
+}
+
+/* ===========================
+   Summary Page
+   =========================== */
+
+@media (min-width: 1100px) {
+  .summary-page .content-panel {
+    max-width: 860px;
+  }
+
+  .summary-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  /* Keep header controls together instead of stretching across full width */
+  .summary-header-row {
+    justify-content: flex-start;
+    gap: 1.5rem;
+    max-width: 720px;
+  }
+
+  /* Minimum card height so the 2-column grid stays visually balanced */
+  .summary-cards-grid > * {
+    min-height: 240px;
+  }
+}
+
+.summary-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.summary-month-select {
+  width: auto !important;
+  max-width: 180px;
+}
+
+.summary-month-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.15rem 0.5rem 0.15rem 0;
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  color: var(--muted-fg);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.summary-month-trigger:disabled {
+  cursor: default;
+}
+
+.summary-month-trigger__chevron {
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+/* Inner wrapper for summary cards — adds gap between sections.
+   Used inside <Card>; the card itself provides padding + flex column. */
+.summary-card-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-section-title {
+  margin-bottom: 0.25rem;
+}
+
+.summary-subsection-label {
+  margin-bottom: 0.25rem;
+}
+
+.summary-category-list {
+  margin-bottom: 0.5rem;
+}
+
+/* Detalle mes — category list uses fixed numeric tracks so headers align over values
+   (max-content sizes each row independently, which desyncs header vs. data rows) */
+.detalle-cat-row {
+  display: grid;
+  grid-template-columns: 1fr 4.5rem 4.5rem;   /* label · personal · compartido */
+  column-gap: 0.9rem;
+  align-items: center;
+  padding: 0.2rem 0;
+}
+
+.detalle-cat-row--hogar {
+  grid-template-columns: 1fr 4.5rem;          /* label · total */
+}
+
+.detalle-cat-row__head {
+  font-size: 0.65rem;
+  color: var(--muted-fg);
+}
+
+.detalle-cat-row__num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.detalle-cat-row__label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.detalle-cat-row__label > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detalle-cat-row__chevron {
+  font-size: 0.5rem;
+  color: var(--muted-fg);
+  display: inline-block;
+  transition: transform 0.15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Detalle mes — expanded transactions as compact list rows */
+.detalle-tx-wrap {
+  margin: 0.1rem 0 0.4rem 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--primary, #4f81bd);
+}
+
+.detalle-tx {
+  display: grid;
+  grid-template-columns: max-content 1fr;   /* badge · content */
+  column-gap: 0.4rem;
+  align-items: start;
+  padding: 0.3rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.detalle-tx:first-child {
+  border-top: none;
+}
+
+.detalle-tx__main {
+  min-width: 0;
+}
+
+.detalle-tx__line1 {
+  display: grid;
+  grid-template-columns: max-content 1fr;   /* date · amount (amount right-aligned) */
+  column-gap: 0.4rem;
+  align-items: baseline;
+}
+
+.detalle-tx__date {
+  font-size: 0.62rem;
+  color: var(--muted-fg);
+  white-space: nowrap;
+}
+
+.detalle-tx__desc {
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: var(--muted-fg);
+  margin-top: 0.05rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.detalle-tx__amount {
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--fg);
+}
+
+.detalle-tx__ccy {
+  font-size: 0.6rem;
+  color: var(--muted-fg);
+}
+
+.detalle-tx__line2 {
+  font-size: 0.6rem;
+  color: var(--muted-fg);
+  margin-top: 0.05rem;
+}
+
+.detalle-tx__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.1rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.62rem;
+  color: var(--muted-fg);
+}
+
+.detalle-tx__footer-total {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0;
+}
+
+.summary-row-label {
+  margin-top: 0;
+  white-space: normal;
+  overflow: visible;
+}
+
+.summary-row-value {
+  white-space: nowrap;
+}
+
+.summary-subtotals {
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.summary-row-total {
+  padding-top: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.summary-saldo-amount {
+  font-weight: 700;
+}
+
+/* Averages card — ranked rows with magnitude bar (replaces rigid table; can't clip) */
+.avg-rank-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.avg-rank-row {
+  padding: 0.35rem 0;
+}
+
+.avg-rank-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.avg-rank-row__cat {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fg);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avg-rank-row__pct {
+  font-weight: 400;
+  color: var(--muted-fg);
+}
+
+.avg-rank-row__total {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fg);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.avg-rank-row__track {
+  height: 4px;
+  margin: 0.2rem 0;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.avg-rank-row__bar {
+  height: 100%;
+  border-radius: 2px;
+}
+
+.avg-rank-row__bar--income {
+  background: var(--accent);
+}
+
+.avg-rank-row__bar--savings {
+  background: var(--accent);
+}
+
+.avg-rank-row__bar--savings-negative {
+  background: var(--destructive);
+}
+
+.avg-rank-row__sub {
+  font-size: 0.62rem;
+  color: var(--muted-fg);
+}
+
+.summary-saldo-negative {
+  color: var(--destructive);
+}
+
+.summary-saldo-positive {
+  color: var(--accent);
+}
+
+/* Summary Charts */
+.summary-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .summary-charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.summary-chart-container {
+  padding: 0.75rem;
+}
+
+.summary-chart-title {
+  font-size: 0.8rem;
+  color: var(--fg);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.summary-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--muted-fg);
+}
+
+.summary-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.summary-chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

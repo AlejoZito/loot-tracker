@@ -1,0 +1,68 @@
+/* ===========================
+   Card — Component styles
+   ===========================
+   Base styles apply to all themes. Orc theme overrides
+   these in styles/orc-theme.css.
+   =========================== */
+
+/* --- Structure --- */
+
+.card {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vertical rhythm helper — gap between stacked sections inside a card */
+.card-section + .card-section {
+  margin-top: 0.75rem;
+}
+
+/* Inline row inside a card — label / value pair */
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0;
+}
+
+/* --- Base visuals (material-style defaults) ---
+   Typography classes are scoped to the Card component.
+   Do NOT use card-title / card-text / card-meta / card-amount outside <Card>.
+*/
+
+.card {
+  padding:1rem 1.8rem;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.card-meta {
+  font-size: 0.8125rem;
+  color: var(--muted-fg);
+}
+
+.card-text {
+  font-size: 0.8125rem;
+  color: var(--muted-fg);
+}
+
+.card-amount {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.card-amount--income {
+  color: var(--accent);
+}
+
+.card-amount--expense {
+  color: var(--destructive);
+}

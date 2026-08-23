@@ -1,0 +1,21 @@
+// Re-export common types
+export type {
+  Expense,
+  Category,
+  MonthlySummary,
+  LoginRequest,
+  LoginResponse,
+  TransactionType,
+  CategoryType,
+  Currency,
+  HabitCategory,
+  Habit,
+  HabitMonthSummary,
+  HabitHistoryRow,
+  SummaryMonth,
+  UserPair,
+  IncomeCategoryBreakdown,
+  CategoryHistoryRow,
+  InstallmentExpense,
+  AppConfig,
+} from '../../../common/types';

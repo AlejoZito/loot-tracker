@@ -1,0 +1,32 @@
+.pixel-toggle {
+  position: relative;
+  display: inline-block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pixel-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pixel-toggle__bg {
+  display: block;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+.pixel-toggle__btn {
+  position: absolute;
+  /* Vertical centering without transform — avoids fractional-pixel jitter */
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  height: fit-content;
+  left: 0;
+  transition: transform 300ms ease-in-out;
+  pointer-events: none;
+  image-rendering: pixelated;
+}

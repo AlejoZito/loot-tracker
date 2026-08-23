@@ -141,3 +141,21 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Secrets / credentials (never commit)
+credentials.json
+**/credentials.json
+commands/auth/*.json
+*.pem
+*.key
+*.dmp
+
+# Personal data exports
+input/
+
+# Claude Code local (per-developer) settings
+.claude/settings.local.json
+
+# Local xlsx datasource — your own writable working copy (DATA_SOURCE=xlsx, the default).
+# Seeded from server/resources/sample-sheet-db/ on first run; never shared/committed.
+server/data/
